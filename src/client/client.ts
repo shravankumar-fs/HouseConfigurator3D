@@ -2,16 +2,16 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import Stats from 'three/examples/jsm/libs/stats.module';
 
 import { EnvironmentManager } from './EnvironmentManager';
 import { WallBorder } from './WallBorder';
 import { Dialog } from './Dialog';
 import { DialogInt } from './DialogInt';
 import { CSG } from 'three-csg-ts';
+import { Border } from './Border';
 
-const stats = Stats();
-document.body.appendChild(stats.dom);
+// const stats = Stats();
+// document.body.appendChild(stats.dom);
 let envManager = new EnvironmentManager();
 let scene = envManager.scene;
 let renderer = envManager.renderer;
@@ -22,8 +22,8 @@ controls.minPolarAngle = Math.PI / 3.5;
 controls.maxPolarAngle = Math.PI / 2.2;
 controls.maxDistance = 50;
 controls.minDistance = -50;
-controls.enableDamping = false;
-controls.dampingFactor = 0.01;
+controls.enableDamping = true;
+controls.dampingFactor = 0.1;
 controls.enablePan = false;
 controls.screenSpacePanning = false;
 window.addEventListener('resize', () => envManager.onWindowResize(), false);
@@ -65,10 +65,8 @@ let walls: THREE.Mesh[] = [];
 const fbxLoader = new FBXLoader();
 let objects: THREE.Mesh[] = [];
 let count = 0;
-const wallBorderMap = new Map<string, WallBorder>();
+const wallBorderMap = new Map<string, Border>();
 fbxLoader.load(
-  // "resources/interior-4.fbx",
-  // "resources/int5.fbx",
   'resources/intmodified.fbx',
   (obj) => {
     obj.traverse((child) => {
@@ -87,6 +85,7 @@ fbxLoader.load(
 
           mesh.material.color = new THREE.Color(0x1f6f8f);
           mesh.position.y = 2.8;
+
           walls.push(mesh);
         } else {
           if (mesh.name.toLowerCase().includes('floor')) {
@@ -102,6 +101,7 @@ fbxLoader.load(
           walls.forEach((item) => {
             item.updateMatrix();
             // console.log(item.geometry.attributes.position);
+
             scene.add(item);
           });
           walls.forEach((item) => {
@@ -197,8 +197,8 @@ function adjustDoor() {
             wall.position.z + 2 > door.position.z &&
             wall.position.z - 2 < door.position.z &&
             wallBox.getWidth() > wallBox.getDepth() &&
-            wallBox.xMin < door.position.x &&
-            wallBox.xMax > door.position.x
+            wallBox.getMinX() < door.position.x &&
+            wallBox.getMaxX() > door.position.x
           ) {
             door.position.z = wall.position.z + 0.15;
           } else {
@@ -212,8 +212,7 @@ function adjustDoor() {
 function adjustWindow() {
   windows.forEach((window) => {
     window.updateMatrix();
-    let windowBox = new WallBorder(window);
-    // window.position.y = windowBox.getHeight() / 2;
+    let windowBox: Border = new WallBorder(window);
     walls.forEach((wall, idx) => {
       if (!wall.name.toLowerCase().includes('outer')) {
         let wallBox = wallBorderMap.get(wall.name);
@@ -223,8 +222,8 @@ function adjustWindow() {
             wall.position.z + 2 > window.position.z &&
             wall.position.z - 2 < window.position.z &&
             wallBox.getWidth() > wallBox.getDepth() &&
-            wallBox.xMin < window.position.x &&
-            wallBox.xMax > window.position.x
+            wallBox.getMinX() < window.position.x &&
+            wallBox.getMaxX() > window.position.x
           ) {
             scene.children
               .filter((item) => item.name == name)
@@ -263,7 +262,6 @@ function changeEnvironment(event: THREE.Event) {
     x: (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
     y: -(event.clientY / renderer.domElement.clientHeight) * 2 + 1,
   };
-  // console.log(mouse);
 
   raycaster.setFromCamera(mouse, camera);
   const intersects: THREE.Intersection[] = raycaster.intersectObjects(
@@ -326,7 +324,7 @@ function animate() {
   controls.update();
   envManager.render();
 
-  stats.update();
+  // stats.update();
 }
 
 animate();

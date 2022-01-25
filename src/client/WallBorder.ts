@@ -1,6 +1,7 @@
 import * as THREE from 'three';
+import { Border } from './Border';
 
-export class WallBorder {
+export class WallBorder implements Border {
   private boundingBox: THREE.Box3 = new THREE.Box3();
 
   private width: number = 0;
@@ -20,6 +21,7 @@ export class WallBorder {
       wall.updateMatrixWorld(true);
       this.boundingBox.applyMatrix4(wall.matrixWorld);
     }
+
     this.xMin = this.boundingBox.min.x;
     this.xMax = this.boundingBox.max.x;
 
@@ -48,5 +50,24 @@ export class WallBorder {
 
   getDepth(): number {
     return this.depth;
+  }
+
+  getMinX(): number {
+    return this.xMin;
+  }
+  getMaxX(): number {
+    return this.xMax;
+  }
+  getMinY(): number {
+    return this.yMin;
+  }
+  getMaxY(): number {
+    return this.yMax;
+  }
+  getMinZ(): number {
+    return this.zMin;
+  }
+  getMaxZ(): number {
+    return this.zMax;
   }
 }

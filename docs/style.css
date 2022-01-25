@@ -12,48 +12,73 @@ canvas {
   display: flex;
   flex-direction: column;
   z-index: 10;
-  background-color: hsla(207, 44%, 49%, 0.3);
+  background-color: hsla(0, 0%, 100%, 0.8);
   position: absolute;
   bottom: 200px;
-  left: 10px;
-  height: 200px;
+  left: 0px;
+  height: fit-content;
   width: 200px;
-  border-radius: 20px;
+  border-radius: 0 20px 20px 0;
   gap: 20px;
-  padding: 20px;
+  padding: 20px 5px;
+  animation: dialogue-appear 0.6s ease-in-out;
+}
+@keyframes dialogue-appear {
+  0% {
+    left: -200px;
+  }
+  100% {
+    left: 0px;
+  }
+}
+.subDialogue {
+  box-shadow: 0px 2px 1px rgba(0, 0, 100, 0.1);
 }
 .title {
   width: inherit;
   text-align: center;
-  color: white;
-  font-weight: 900;
-  letter-spacing: 2px;
+  color: midnightblue;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
 }
 .set {
+  padding: 20px 10px;
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: center;
   gap: 20px;
 }
-.set .setItem {
+.set .colorItem {
   height: 40px;
   width: 40px;
   border-radius: 10px;
   cursor: pointer;
+  border-top: 1px solid rgba(0, 0, 0, 0.7);
+}
+.set .textureItem {
+  height: 40px;
+  width: 40px;
+  border-radius: 10px;
+  cursor: pointer;
+  border-top: 1px solid rgba(0, 0, 0, 0.7);
 }
 .selected {
   transform: scale(1.1);
   box-shadow: 2px 4px 2px rgba(0, 0, 0, 0.3),
     0px -2px 2px rgba(255, 255, 255, 0.3);
+  border-top: none;
 }
 .actionBtns {
   display: flex;
   justify-content: space-evenly;
   gap: 10px;
+  padding: 5px 0px;
 }
+
 .actionBtns .action {
-  background: linear-gradient(135deg, steelblue, hsl(207, 44%, 29%));
+  background: linear-gradient(135deg, hsl(240, 64%, 27%), hsl(240, 64%, 47%));
   color: white;
   border: none;
   border-radius: 10px;
@@ -66,7 +91,7 @@ canvas {
 .actionBtns .action:active,
 .actionBtns .action:hover {
   transform: scale(0.99);
-  background-color: hsl(207, 44%, 29%);
+  background: linear-gradient(-135deg, hsl(240, 64%, 27%), hsl(240, 64%, 47%));
 }
 
 .info {
@@ -82,8 +107,6 @@ canvas {
   padding: 20px;
   border-radius: 20px;
 }
-.info .title {
-}
 .buttonsAdd {
   display: flex;
   gap: 10px;
@@ -97,6 +120,7 @@ canvas {
   height: 30px;
   width: 80px;
   cursor: pointer;
+  padding: 5px 10px;
 }
 .buttonAdd:active,
 .buttonAdd:hover {
