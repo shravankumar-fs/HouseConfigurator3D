@@ -9,21 +9,17 @@ body {
   position: relative;
 }
 :root {
-  --bg-1: linear-gradient(
-    135deg,
-    hsla(130, 78%, 100%, 0.4),
-    hsla(130, 78%, 80%, 0.4)
-  );
-  --bg-2: linear-gradient(
+  --bg-panel: linear-gradient(
     135deg,
     hsla(207, 43%, 55%, 0.8),
-    hsla(207, 43%, 35%, 0.8)
+    hsla(207, 71%, 32%, 0.8)
   );
-  --bg-3: linear-gradient(
+  --bg-button: linear-gradient(
     135deg,
-    hsla(291, 86%, 53%, 0.3),
-    hsla(291, 86%, 33%, 0.3)
+    hsla(207, 44%, 49%, 1),
+    hsla(207, 44%, 20%, 1)
   );
+  --bg-button-rev: hsl(207, 44%, 19%, 1);
 }
 canvas {
   z-index: 1;
@@ -31,7 +27,7 @@ canvas {
 .sidebar {
   position: relative;
   width: fit-content;
-  margin-top: 100px;
+  margin-top: 50px;
 }
 .panel {
   position: absolute;
@@ -41,12 +37,31 @@ canvas {
   width: fit-content;
   padding: 30px 10px;
   z-index: 3;
-  background: var(--bg-2);
+  background: var(--bg-panel);
   box-shadow: 12px 12px 16px 0 rgba(0, 0, 0, 0.25),
     -8px -8px 12px 0 rgba(255, 255, 255, 0.3);
   border-radius: 0 20px 20px 0;
 }
-
+.themeSelector {
+  display: flex;
+}
+.themeSelector select {
+  background-color: var(--bg-button-rev);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 5px 10px;
+}
+.themeSelector select option {
+  background-color: var(--bg-button);
+  color: white;
+  border: none;
+  border-radius: 10px;
+}
+.themeSelector label {
+  color: var(--bg-button-rev);
+  font-weight: 700;
+}
 .info {
   display: flex;
   flex-direction: column;
@@ -74,7 +89,7 @@ canvas {
   padding: 5px 10px;
   height: fit-content;
   width: fit-content;
-  background: linear-gradient(135deg, steelblue, hsl(207, 44%, 19%));
+  background: var(--bg-button);
   box-shadow: 8px 8px 12px 0 rgba(0, 0, 0, 0.25),
     -4px -4px 8px 0 rgba(255, 255, 255, 0.3);
 }
@@ -85,7 +100,7 @@ canvas {
 .buttonAdd:active,
 .buttonAdd:hover {
   transform: scale(0.98);
-  background: hsl(207, 44%, 29%);
+  background: var(--bg-button-rev);
 }
 .dialog {
   position: relative;
@@ -125,12 +140,12 @@ canvas {
 .title {
   width: inherit;
   text-align: center;
-  color: steelblue;
+  color: var(--bg-button-rev);
   background-color: whitesmoke;
   padding: 5px;
   border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   letter-spacing: 0.6px;
   text-transform: uppercase;
 }
@@ -174,7 +189,7 @@ canvas {
 }
 
 .actionBtns .action {
-  background: linear-gradient(135deg, steelblue, hsl(207, 44%, 19%));
+  background: var(--bg-button);
   box-shadow: 8px 8px 12px 0 rgba(0, 0, 0, 0.25),
     -4px -4px 8px 0 rgba(255, 255, 255, 0.3);
   color: white;
@@ -189,7 +204,7 @@ canvas {
 .actionBtns .action:active,
 .actionBtns .action:hover {
   transform: scale(0.98);
-  background: hsl(207, 44%, 29%);
+  background: var(--bg-button-rev);
 }
 
 #editBtn {

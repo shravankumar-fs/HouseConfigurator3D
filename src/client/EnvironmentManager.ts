@@ -11,6 +11,7 @@ export class EnvironmentManager {
     this.initCamera();
     this.initRenderer();
     this.initLights();
+    this.addGround();
   }
   initLights() {
     this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 2, 60, 1);
@@ -45,7 +46,7 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    this._scene.fog = new THREE.Fog(0x90ff90, 0.1, 500);
+    this._scene.fog = new THREE.Fog(0x001f00, 50, 200);
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
 
@@ -68,9 +69,20 @@ export class EnvironmentManager {
     } else {
       this._renderer = new THREE.WebGLRenderer();
     }
-    this._renderer.shadowMap.enabled = true;
-    this._renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     this._renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  addGround() {
+    let groundG = new THREE.CircleBufferGeometry(200, 1000);
+    let tex = new THREE.TextureLoader().load('images/grass.jpg');
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(100, 100);
+    let groundM = new THREE.MeshBasicMaterial({ map: tex });
+    let ground = new THREE.Mesh(groundG, groundM);
+    ground.rotation.x -= Math.PI / 2;
+    ground.position.y = -0.2;
+    this._scene.add(ground);
   }
 
   onWindowResize() {

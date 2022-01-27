@@ -10,6 +10,7 @@ import { HTMLAddElement } from './HTMLAddElement';
 import { CSG } from 'three-csg-ts';
 import { Border } from './Border';
 import { EditButtton } from './EditButton';
+import { Panel } from './Panel';
 
 // const stats = Stats();
 // document.body.appendChild(stats.dom);
@@ -34,6 +35,8 @@ const fbxLoader = new FBXLoader();
 let objects: THREE.Mesh[] = [];
 let count = 0;
 const wallBorderMap = new Map<string, Border>();
+let panelManager = new Panel();
+panelManager.registerPanelChange();
 
 fbxLoader.load(
   'models/intmodified10.fbx',
@@ -58,7 +61,8 @@ fbxLoader.load(
             mesh.material.color = new THREE.Color(0xdfaf00);
           } else if (mesh.name.toLowerCase().includes('roof')) {
             mesh.material.transparent = true;
-            mesh.material.opacity = 0.1;
+            mesh.material.opacity = 0.5;
+            mesh.material.color = new THREE.Color(0xffffff);
           } else {
             mesh.material.color = new THREE.Color(0xffffff);
           }
@@ -69,6 +73,7 @@ fbxLoader.load(
           walls.forEach((item) => {
             item.updateMatrix();
             // console.log(item.geometry.attributes.position);
+            console.log(item.id, item.name);
 
             scene.add(item);
           });
@@ -168,7 +173,7 @@ function adjustDoor() {
             wallBox.getMinX() < door.position.x &&
             wallBox.getMaxX() > door.position.x
           ) {
-            door.position.z = wall.position.z + 0.15;
+            door.position.z = wall.position.z + 0.25;
           } else {
           }
         }
@@ -220,6 +225,7 @@ function adjustWindow() {
     });
   });
 }
+
 let meshCache: THREE.Mesh[] = [];
 const raycaster = new THREE.Raycaster();
 document.getElementById('canvas')?.addEventListener('click', changeEnvironment);
@@ -282,19 +288,6 @@ function changeEnvironment(event: THREE.Event) {
     }
   }
 }
-
-let groundG = new THREE.CircleBufferGeometry(200, 1000);
-let tex = new THREE.TextureLoader().load('images/grass.jpg');
-tex.wrapS = THREE.RepeatWrapping;
-tex.wrapT = THREE.RepeatWrapping;
-tex.repeat.set(100, 100);
-let groundM = new THREE.MeshBasicMaterial({ map: tex });
-let ground = new THREE.Mesh(groundG, groundM);
-ground.rotation.x -= Math.PI / 2;
-ground.position.y = -0.2;
-ground.receiveShadow = true;
-ground.castShadow = true;
-scene.add(ground);
 
 function animate() {
   requestAnimationFrame(animate);
