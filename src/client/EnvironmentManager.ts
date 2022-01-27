@@ -10,6 +10,26 @@ export class EnvironmentManager {
     this.initScene();
     this.initCamera();
     this.initRenderer();
+    this.initLights();
+  }
+  initLights() {
+    this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 2, 60, 1);
+    // this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1.5, 60, 1);
+    this.initLight(new THREE.Vector3(0, 0, -45), 0xffffff, 1.5, 60, 1);
+    this.initLight(new THREE.Vector3(0, 0, 45), 0xffffff, 1.5, 60, 1);
+    this.initLight(new THREE.Vector3(45, 0, 0), 0xffffff, 1.5, 60, 1);
+    this.initLight(new THREE.Vector3(-45, 0, 0), 0xffffff, 1.5, 60, 1);
+  }
+  initLight(
+    pos: THREE.Vector3,
+    color: number,
+    intensity: number,
+    distance: number,
+    decay: number
+  ) {
+    let light = new THREE.PointLight(color, intensity, distance, decay);
+    light.position.set(pos.x, pos.y, pos.z);
+    this._scene.add(light);
   }
 
   public get scene() {

@@ -29,39 +29,6 @@ controls.enablePan = false;
 controls.screenSpacePanning = false;
 window.addEventListener('resize', () => envManager.onWindowResize(), false);
 
-{
-  let light = new THREE.PointLight(0xffffff, 2, 60, 1);
-  light.position.set(0, 40, 0);
-  scene.add(light);
-
-  // light.castShadow = true;
-  scene.add(light);
-}
-{
-  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
-  light.position.set(0, -40, 0);
-  scene.add(light);
-}
-{
-  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
-  light.position.set(0, 0, -45);
-  scene.add(light);
-}
-{
-  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
-  light.position.set(0, 0, 45);
-  scene.add(light);
-}
-{
-  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
-  light.position.set(45, 0, 0);
-  scene.add(light);
-}
-{
-  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
-  light.position.set(-45, 0, 0);
-  scene.add(light);
-}
 let walls: THREE.Mesh[] = [];
 const fbxLoader = new FBXLoader();
 let objects: THREE.Mesh[] = [];
@@ -69,7 +36,7 @@ let count = 0;
 const wallBorderMap = new Map<string, Border>();
 
 fbxLoader.load(
-  'models/interiormod9.fbx',
+  'models/intmodified10.fbx',
   (obj) => {
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
@@ -91,7 +58,7 @@ fbxLoader.load(
             mesh.material.color = new THREE.Color(0xdfaf00);
           } else if (mesh.name.toLowerCase().includes('roof')) {
             mesh.material.transparent = true;
-            mesh.material.opacity = 0.9;
+            mesh.material.opacity = 0.1;
           } else {
             mesh.material.color = new THREE.Color(0xffffff);
           }
