@@ -1,5 +1,5 @@
-import * as THREE from "three";
-import { TextureLoader } from "three";
+import * as THREE from 'three';
+import { TextureLoader } from 'three';
 
 export class EnvironmentManager {
   private _scene!: THREE.Scene;
@@ -25,8 +25,8 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    this._scene.fog = new THREE.Fog(0xffffff, 0.1, 1000);
-    this.scene.background = new TextureLoader().load("resources/sky.jpg");
+    this._scene.fog = new THREE.Fog(0x90ff90, 0.1, 500);
+    this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
 
   initCamera() {
@@ -40,7 +40,7 @@ export class EnvironmentManager {
   }
 
   initRenderer() {
-    const canvas = document.querySelector("canvas");
+    const canvas = document.querySelector('canvas');
     if (canvas) {
       this._renderer = new THREE.WebGLRenderer({
         canvas: canvas,

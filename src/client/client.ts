@@ -6,9 +6,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EnvironmentManager } from './EnvironmentManager';
 import { WallBorder } from './WallBorder';
 import { Dialog } from './Dialog';
-import { DialogInt } from './DialogInt';
+import { HTMLAddElement } from './HTMLAddElement';
 import { CSG } from 'three-csg-ts';
 import { Border } from './Border';
+import { EditButtton } from './EditButton';
 
 // const stats = Stats();
 // document.body.appendChild(stats.dom);
@@ -18,7 +19,7 @@ let renderer = envManager.renderer;
 let camera = envManager.camera;
 document.body.appendChild(renderer.domElement);
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.minPolarAngle = Math.PI / 3.5;
+controls.minPolarAngle = Math.PI / 10;
 controls.maxPolarAngle = Math.PI / 2.2;
 controls.maxDistance = 50;
 controls.minDistance = -50;
@@ -37,27 +38,27 @@ window.addEventListener('resize', () => envManager.onWindowResize(), false);
   scene.add(light);
 }
 {
-  let light = new THREE.PointLight(0xffffff, 2, 60, 1);
+  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
   light.position.set(0, -40, 0);
   scene.add(light);
 }
 {
-  let light = new THREE.PointLight(0xffffff, 2, 60, 1);
+  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
   light.position.set(0, 0, -45);
   scene.add(light);
 }
 {
-  let light = new THREE.PointLight(0xffffff, 2, 60, 1);
+  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
   light.position.set(0, 0, 45);
   scene.add(light);
 }
 {
-  let light = new THREE.PointLight(0xffffff, 2, 60, 1);
+  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
   light.position.set(45, 0, 0);
   scene.add(light);
 }
 {
-  let light = new THREE.PointLight(0xffffff, 2, 60, 1);
+  let light = new THREE.PointLight(0xffffff, 1.5, 60, 1);
   light.position.set(-45, 0, 0);
   scene.add(light);
 }
@@ -66,8 +67,9 @@ const fbxLoader = new FBXLoader();
 let objects: THREE.Mesh[] = [];
 let count = 0;
 const wallBorderMap = new Map<string, Border>();
+
 fbxLoader.load(
-  'resources/intmodified.fbx',
+  'models/interiormod9.fbx',
   (obj) => {
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
@@ -75,29 +77,28 @@ fbxLoader.load(
           THREE.BufferGeometry,
           THREE.MeshLambertMaterial
         >;
+        mesh.material = mesh.material.clone();
         mesh.material.side = THREE.DoubleSide;
-        mesh.material.reflectivity = 0;
+        mesh.material.reflectivity = 0.5;
         mesh.material.refractionRatio = 0.3;
         mesh.updateMatrix();
         mesh.updateMatrixWorld(true);
         if (mesh.name.toLowerCase().includes('wall')) {
-          //
-
           mesh.material.color = new THREE.Color(0x1f6f8f);
-          mesh.position.y = 2.8;
-
           walls.push(mesh);
         } else {
           if (mesh.name.toLowerCase().includes('floor')) {
             mesh.material.color = new THREE.Color(0xdfaf00);
+          } else if (mesh.name.toLowerCase().includes('roof')) {
+            mesh.material.transparent = true;
+            mesh.material.opacity = 0.9;
           } else {
             mesh.material.color = new THREE.Color(0xffffff);
           }
           objects.push(mesh);
         }
         ++count;
-
-        if (count == 38) {
+        if (count == 77) {
           walls.forEach((item) => {
             item.updateMatrix();
             // console.log(item.geometry.attributes.position);
@@ -146,7 +147,7 @@ function addWindow() {
 
 function addDoor() {
   fbxLoader.load(
-    'resources/door.fbx',
+    'models/door.fbx',
     (obj: THREE.Object3D<THREE.Event>) => {
       obj.traverse(function (child) {
         if ((child as THREE.Mesh).isMesh) {
@@ -270,41 +271,53 @@ function changeEnvironment(event: THREE.Event) {
 
   if (intersects.length > 0) {
     let item = intersects[0];
-    // console.log(item);
-    if (item.object.name.toLowerCase().includes('wall')) {
-      let d: DialogInt = new Dialog(
-        item.object as THREE.Mesh,
-        'Wall',
-        meshCache
-      );
-      d.addDialog();
-    } else if (item.object.name.toLowerCase().includes('floor')) {
-      let d: DialogInt = new Dialog(
-        item.object as THREE.Mesh,
-        'Floor',
-        meshCache
-      );
-      d.addDialog();
-    } else if (item.object.name.toLowerCase().includes('door')) {
-      let d: DialogInt = new Dialog(
-        item.object as THREE.Mesh,
-        'Door',
-        meshCache
-      );
-      d.addDialog();
-    } else if (item.object.name.toLowerCase().includes('window')) {
-      let d: DialogInt = new Dialog(
-        item.object as THREE.Mesh,
-        'Window',
-        meshCache
-      );
-      d.addDialog();
+    if (
+      item.object.name.toLowerCase().includes('wall') ||
+      item.object.name.toLowerCase().includes('floor') ||
+      item.object.name.toLowerCase().includes('door') ||
+      item.object.name.toLowerCase().includes('window')
+    ) {
+      let editBtn = new EditButtton(event.clientX, event.clientY);
+      editBtn.add();
+      setTimeout(() => editBtn.button.remove(), 5000);
+      editBtn.button.addEventListener('click', () => {
+        editBtn.button.remove();
+        if (item.object.name.toLowerCase().includes('wall')) {
+          let dialog: HTMLAddElement = new Dialog(
+            item.object as THREE.Mesh,
+            'Wall',
+            meshCache
+          );
+          dialog.add();
+        } else if (item.object.name.toLowerCase().includes('floor')) {
+          let dialog: HTMLAddElement = new Dialog(
+            item.object as THREE.Mesh,
+            'Floor',
+            meshCache
+          );
+          dialog.add();
+        } else if (item.object.name.toLowerCase().includes('door')) {
+          let dialog: HTMLAddElement = new Dialog(
+            item.object as THREE.Mesh,
+            'Door',
+            meshCache
+          );
+          dialog.add();
+        } else if (item.object.name.toLowerCase().includes('window')) {
+          let dialog: HTMLAddElement = new Dialog(
+            item.object as THREE.Mesh,
+            'Window',
+            meshCache
+          );
+          dialog.add();
+        }
+      });
     }
   }
 }
 
-let groundG = new THREE.PlaneBufferGeometry(1000, 1000, 100, 100);
-let tex = new THREE.TextureLoader().load('resources/grass.jpg');
+let groundG = new THREE.CircleBufferGeometry(200, 1000);
+let tex = new THREE.TextureLoader().load('images/grass.jpg');
 tex.wrapS = THREE.RepeatWrapping;
 tex.wrapT = THREE.RepeatWrapping;
 tex.repeat.set(100, 100);

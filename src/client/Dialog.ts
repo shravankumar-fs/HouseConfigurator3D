@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { DialogInt } from './DialogInt';
+import { HTMLAddElement } from './HTMLAddElement';
 
-export class Dialog implements DialogInt {
+export class Dialog implements HTMLAddElement {
   meshItem: THREE.Mesh;
 
   constructor(
@@ -20,17 +20,19 @@ export class Dialog implements DialogInt {
     'rgb(253,244,227)',
     'rgb(253,100,100)',
     'rgb(63,0,0)',
+    'rgb(10,255,255)',
+    'rgb(100,255,50)',
   ];
   textures: string[] = [
-    'resources/models/wtext0.jpg',
-    'resources/models/wtext1.jpg',
-    'resources/models/wtext2.jpg',
-    'resources/models/wtext3.jpg',
-    'resources/models/wtext4.jpg',
-    'resources/models/wtext5.jpg',
+    'images/wtext0.jpg',
+    'images/wtext1.jpg',
+    'images/wtext2.jpg',
+    'images/wtext3.jpg',
+    'images/wtext4.jpg',
+    'images/wtext5.jpg',
   ];
 
-  addDialog(): void {
+  add(): void {
     document.querySelectorAll('.dialog').forEach((d) => d.remove());
     this.meshCache.forEach((mesh) => {
       this.adjustTransparency(mesh);
@@ -40,7 +42,7 @@ export class Dialog implements DialogInt {
 
     let dialog = this.createElement('div', 'dialog', 'dialog');
     this.fillDialogueContent(dialog as HTMLDivElement);
-    document.body.appendChild(dialog);
+    document.getElementById('panel')?.appendChild(dialog);
 
     let selItems = document.querySelectorAll('.colorItem');
     let selectedColor = '';
@@ -77,7 +79,7 @@ export class Dialog implements DialogInt {
           let text = new THREE.TextureLoader().load(selectedTexture);
           text.wrapS = THREE.RepeatWrapping;
           text.wrapT = THREE.RepeatWrapping;
-          text.repeat.set(6, 6);
+          // text.repeat.set(6, 6);
           (this.meshItem.material as THREE.MeshLambertMaterial).map = text;
         } else {
           (this.meshItem.material as THREE.MeshLambertMaterial).map = null;
@@ -146,7 +148,7 @@ export class Dialog implements DialogInt {
         'texture' + Math.random().toPrecision(3).replace('.', ''),
         'textureItem'
       );
-      textureElement.style.background = `url(${texture})`;
+      textureElement.style.background = `url(${texture}) center/cover`;
       textureSet.appendChild(textureElement);
     });
     textureDialogue.appendChild(textureSet);
@@ -179,9 +181,13 @@ export class Dialog implements DialogInt {
     if (mesh.name.toLowerCase().includes('window')) {
       (mesh.material as THREE.MeshLambertMaterial).transparent = true;
       (mesh.material as THREE.MeshLambertMaterial).opacity = 0.2;
+
+      // (this.meshItem.material as THREE.MeshLambertMaterial).wireframe = false;
     } else {
       (mesh.material as THREE.MeshLambertMaterial).transparent = false;
       (mesh.material as THREE.MeshLambertMaterial).opacity = 1;
+
+      // (this.meshItem.material as THREE.MeshLambertMaterial).wireframe = false;
     }
     (mesh.material as THREE.MeshLambertMaterial).needsUpdate = true;
   }
