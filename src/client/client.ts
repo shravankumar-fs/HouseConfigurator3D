@@ -75,7 +75,6 @@ fbxLoader.load(
           walls.forEach((item) => {
             item.wall.updateMatrix();
             scene.add(item.wall);
-            console.log(item, item.type);
           });
           walls.forEach((item) => {
             wallBorderMap.set(item.name, item);
@@ -83,7 +82,6 @@ fbxLoader.load(
           objects.forEach((item) => {
             item.updateMatrix();
             scene.add(item);
-            // console.log(item.name);
           });
         }
       }
