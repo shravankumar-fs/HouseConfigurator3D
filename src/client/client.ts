@@ -11,6 +11,7 @@ import { CSG } from 'three-csg-ts';
 import { Border } from './Border';
 import { EditButtton } from './EditButton';
 import { Panel } from './Panel';
+import { WallItem } from './WallItem';
 
 // const stats = Stats();
 // document.body.appendChild(stats.dom);
@@ -30,11 +31,11 @@ controls.enablePan = false;
 controls.screenSpacePanning = false;
 window.addEventListener('resize', () => envManager.onWindowResize(), false);
 
-let walls: THREE.Mesh[] = [];
+let walls: WallItem[] = [];
 const fbxLoader = new FBXLoader();
 let objects: THREE.Mesh[] = [];
 let count = 0;
-const wallBorderMap = new Map<string, Border>();
+const wallBorderMap = new Map<string, WallItem>();
 let panelManager = new Panel();
 panelManager.registerPanelChange();
 
@@ -55,7 +56,8 @@ fbxLoader.load(
         mesh.updateMatrixWorld(true);
         if (mesh.name.toLowerCase().includes('wall')) {
           mesh.material.color = new THREE.Color(0x1f6f8f);
-          walls.push(mesh);
+          let wallItem = new WallItem(mesh);
+          walls.push(wallItem);
         } else {
           if (mesh.name.toLowerCase().includes('floor')) {
             mesh.material.color = new THREE.Color(0xdfaf00);
@@ -71,15 +73,12 @@ fbxLoader.load(
         ++count;
         if (count == 77) {
           walls.forEach((item) => {
-            item.updateMatrix();
-            // console.log(item.geometry.attributes.position);
-            console.log(item.id, item.name);
-
-            scene.add(item);
+            item.wall.updateMatrix();
+            scene.add(item.wall);
+            console.log(item, item.type);
           });
           walls.forEach((item) => {
-            let wb = new WallBorder(item);
-            wallBorderMap.set(item.name, wb);
+            wallBorderMap.set(item.name, item);
           });
           objects.forEach((item) => {
             item.updateMatrix();
@@ -132,7 +131,7 @@ function addDoor() {
           (door.material as THREE.MeshLambertMaterial).side = THREE.DoubleSide;
           (door.material as THREE.MeshLambertMaterial).needsUpdate = true;
 
-          door.position.set(0, 5, 0);
+          door.position.set(0, 5, 15);
           draggable.push(door);
           scene.add(door);
           doors.push(door);
@@ -162,20 +161,28 @@ function adjustDoor() {
     door.updateMatrix();
     let doorBox = new WallBorder(door);
     door.position.y = doorBox.getHeight() / 2;
-    walls.forEach((wall, idx) => {
-      if (!wall.name.toLowerCase().includes('outer')) {
-        let wallBox = wallBorderMap.get(wall.name);
-        if (wallBox) {
-          if (
-            wall.position.z + 2 > door.position.z &&
-            wall.position.z - 2 < door.position.z &&
-            wallBox.getWidth() > wallBox.getDepth() &&
-            wallBox.getMinX() < door.position.x &&
-            wallBox.getMaxX() > door.position.x
-          ) {
-            door.position.z = wall.position.z + 0.25;
-          } else {
-          }
+    walls.forEach((wallItem, idx) => {
+      let wallBox = wallItem.border;
+      if (wallBox) {
+        if (
+          wallItem.wall.position.z + 2 > door.position.z &&
+          wallItem.wall.position.z - 2 < door.position.z &&
+          wallItem.type == 'main' &&
+          wallBox.getMinX() < door.position.x &&
+          wallBox.getMaxX() > door.position.x
+        ) {
+          door.rotation.y = 0;
+          door.position.z = wallItem.wall.position.z + 0.25;
+        } else if (
+          wallItem.wall.position.x + 2 > door.position.x &&
+          wallItem.wall.position.x - 2 < door.position.x &&
+          wallItem.type == 'side' &&
+          wallBox.getMinZ() < door.position.z &&
+          wallBox.getMaxZ() > door.position.z
+        ) {
+          door.rotation.y = Math.PI / 2;
+          door.position.x = wallItem.wall.position.x + 0.25;
+        } else {
         }
       }
     });
@@ -186,40 +193,38 @@ function adjustWindow() {
   windows.forEach((window) => {
     window.updateMatrix();
     let windowBox: Border = new WallBorder(window);
-    walls.forEach((wall, idx) => {
-      if (!wall.name.toLowerCase().includes('outer')) {
-        let wallBox = wallBorderMap.get(wall.name);
-        if (wallBox) {
-          let name = 'wallsub' + wall.name;
-          if (
-            wall.position.z + 2 > window.position.z &&
-            wall.position.z - 2 < window.position.z &&
-            wallBox.getWidth() > wallBox.getDepth() &&
-            wallBox.getMinX() < window.position.x &&
-            wallBox.getMaxX() > window.position.x
-          ) {
-            scene.children
-              .filter((item) => item.name == name)
-              .forEach((item) => scene.remove(item));
-            window.position.z = wall.position.z + 0.15;
-            wall.updateMatrix();
-            window.updateMatrix();
+    walls.forEach((wallItem, idx) => {
+      let wallBox = wallItem.border;
+      if (wallBox) {
+        let name = 'wallsub' + wallItem.name;
+        if (
+          wallItem.wall.position.z + 2 > window.position.z &&
+          wallItem.wall.position.z - 2 < window.position.z &&
+          wallBox.getWidth() > wallBox.getDepth() &&
+          wallBox.getMinX() < window.position.x &&
+          wallBox.getMaxX() > window.position.x
+        ) {
+          scene.children
+            .filter((item) => item.name == name)
+            .forEach((item) => scene.remove(item));
+          window.position.z = wallItem.wall.position.z + 0.15;
+          wallItem.wall.updateMatrix();
+          window.updateMatrix();
 
-            const sRes = CSG.subtract(wall, window);
-            sRes.name = name;
-            sRes.position.set(
-              wall.position.x,
-              wall.position.y,
-              wall.position.z
-            );
-            wall.visible = false;
-            scene.add(sRes);
-          } else {
-            scene.children
-              .filter((item) => item.name == name)
-              .forEach((item) => scene.remove(item));
-            wall.visible = true;
-          }
+          const sRes = CSG.subtract(wallItem.wall, window);
+          sRes.name = name;
+          sRes.position.set(
+            wallItem.wall.position.x,
+            wallItem.wall.position.y,
+            wallItem.wall.position.z
+          );
+          wallItem.wall.visible = false;
+          scene.add(sRes);
+        } else {
+          scene.children
+            .filter((item) => item.name == name)
+            .forEach((item) => scene.remove(item));
+          wallItem.wall.visible = true;
         }
       }
     });
@@ -252,7 +257,7 @@ function changeEnvironment(event: THREE.Event) {
     ) {
       let editBtn = new EditButtton(event.clientX, event.clientY);
       editBtn.add();
-      setTimeout(() => editBtn.button.remove(), 5000);
+      setTimeout(() => editBtn.button.remove(), 4000);
       editBtn.button.addEventListener('click', () => {
         editBtn.button.remove();
         if (item.object.name.toLowerCase().includes('wall')) {

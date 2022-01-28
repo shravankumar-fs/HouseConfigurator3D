@@ -20,6 +20,10 @@ body {
     hsla(207, 44%, 20%, 1)
   );
   --bg-button-rev: hsl(207, 44%, 19%, 1);
+  --panel-box-shadow: 12px 12px 16px 0 rgba(0, 0, 0, 0.25),
+    -8px -8px 12px 0 rgba(255, 255, 255, 0.3);
+  --btn-box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.25),
+    -2px -2px 4px 0 rgba(255, 255, 255, 0.3);
 }
 canvas {
   z-index: 1;
@@ -27,6 +31,7 @@ canvas {
 .sidebar {
   position: relative;
   width: fit-content;
+  height: fit-content;
   margin-top: 50px;
 }
 .panel {
@@ -38,12 +43,13 @@ canvas {
   padding: 30px 10px;
   z-index: 3;
   background: var(--bg-panel);
-  box-shadow: 12px 12px 16px 0 rgba(0, 0, 0, 0.25),
-    -8px -8px 12px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: var(--panel-box-shadow);
   border-radius: 0 20px 20px 0;
 }
 .themeSelector {
   display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 .themeSelector select {
   background-color: var(--bg-button-rev);
@@ -56,11 +62,13 @@ canvas {
   background-color: var(--bg-button);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 10px !important;
 }
+
 .themeSelector label {
   color: var(--bg-button-rev);
   font-weight: 700;
+  top: 10px;
 }
 .info {
   display: flex;
@@ -90,8 +98,7 @@ canvas {
   height: fit-content;
   width: fit-content;
   background: var(--bg-button);
-  box-shadow: 8px 8px 12px 0 rgba(0, 0, 0, 0.25),
-    -4px -4px 8px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: var(--btn-box-shadow);
 }
 .buttonAdd img {
   height: 40px;
@@ -126,7 +133,7 @@ canvas {
     top: 0px;
   }
   96% {
-    top: 20px;
+    top: 40px;
   }
   100% {
     top: 0px;
@@ -190,12 +197,10 @@ canvas {
 
 .actionBtns .action {
   background: var(--bg-button);
-  box-shadow: 8px 8px 12px 0 rgba(0, 0, 0, 0.25),
-    -4px -4px 8px 0 rgba(255, 255, 255, 0.3);
+  box-shadow: var(--btn-box-shadow);
   color: white;
   border: none;
   border-radius: 10px;
-  box-shadow: 0px 1px 3px teal;
   height: 30px;
   width: 60px;
   cursor: pointer;
@@ -211,21 +216,22 @@ canvas {
   background: linear-gradient(135deg, yellowgreen, green);
   color: white;
   border: none;
-  border-radius: 10px;
-  font-size: 14px;
+  border-radius: 50%;
+  font-size: 12px;
   padding: 10px;
   cursor: pointer;
-  animation: editBtnAnimate 5s linear;
+  animation: editBtnAnimate 4.2s linear;
   text-transform: capitalize;
 }
 @keyframes editBtnAnimate {
+  0% {
+    background: linear-gradient(135deg, yellowgreen, green);
+  }
   50% {
     opacity: 1;
-    background: linear-gradient(135deg, green);
+    background: green;
   }
-  90%,
   100% {
     opacity: 0;
-    background: green;
   }
 }
