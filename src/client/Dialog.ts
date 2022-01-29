@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { HTMLAddElement } from './HTMLAddElement';
 
-export class Dialog implements HTMLAddElement {
+export class Dialog {
   meshItem: THREE.Mesh;
 
   constructor(

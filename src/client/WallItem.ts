@@ -10,11 +10,8 @@ export class WallItem {
     this._name = _wall.name;
     this._shadowWall = this._wall;
     this._border = new WallBorder(this._wall);
-    if (this._border.getDepth() > this._border.getWidth()) {
-      this._type = 'side';
-    } else {
-      this._type = 'main';
-    }
+    this._type =
+      this._border.getDepth() > this._border.getWidth() ? 'side' : 'main';
   }
 
   public get oWall() {
@@ -23,6 +20,10 @@ export class WallItem {
 
   public get wall() {
     return this._shadowWall;
+  }
+
+  public set wall(wallObject: THREE.Mesh) {
+    this._shadowWall = wallObject;
   }
 
   public get name() {
@@ -38,6 +39,8 @@ export class WallItem {
   }
 
   public resetWall() {
-    this._shadowWall = this._wall;
+    (this._shadowWall as THREE.Mesh).geometry = (
+      this._wall as THREE.Mesh
+    ).geometry.clone();
   }
 }

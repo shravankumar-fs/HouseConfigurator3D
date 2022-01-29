@@ -6,12 +6,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EnvironmentManager } from './EnvironmentManager';
 import { WallBorder } from './WallBorder';
 import { Dialog } from './Dialog';
-import { HTMLAddElement } from './HTMLAddElement';
+import { ControlButton } from './ControlButton';
 import { CSG } from 'three-csg-ts';
 import { Border } from './Border';
-import { EditButtton } from './EditButton';
+import { EditButton } from './EditButton';
 import { Panel } from './Panel';
 import { WallItem } from './WallItem';
+import { BoxBufferGeometry } from 'three';
+import { ButtonPanel } from './buttonPanel';
+import { DeleteBtn } from './DeleteButton';
 
 // const stats = Stats();
 // document.body.appendChild(stats.dom);
@@ -122,14 +125,12 @@ function addDoor() {
         if ((child as THREE.Mesh).isMesh) {
           let door = child as THREE.Mesh;
           door.name = 'door';
-          door.geometry.scale(1, 1, 4);
           (door.material as THREE.MeshLambertMaterial).color = new THREE.Color(
             0xff0000
           );
           (door.material as THREE.MeshLambertMaterial).side = THREE.DoubleSide;
           (door.material as THREE.MeshLambertMaterial).needsUpdate = true;
-
-          door.position.set(0, 5, 15);
+          door.position.set(5, 5, 15);
           draggable.push(door);
           scene.add(door);
           doors.push(door);
@@ -153,35 +154,87 @@ dControls.addEventListener('dragstart', function (event) {
 dControls.addEventListener('dragend', function (event) {
   controls.enabled = true;
 });
-
+let test = false;
+let countIt = 0;
 function adjustDoor() {
-  doors.forEach((door) => {
-    door.updateMatrix();
-    let doorBox = new WallBorder(door);
-    door.position.y = doorBox.getHeight() / 2;
-    walls.forEach((wallItem, idx) => {
-      let wallBox = wallItem.border;
-      if (wallBox) {
-        if (
-          wallItem.wall.position.z + 2 > door.position.z &&
-          wallItem.wall.position.z - 2 < door.position.z &&
-          wallItem.type == 'main' &&
-          wallBox.getMinX() < door.position.x &&
-          wallBox.getMaxX() > door.position.x
-        ) {
-          door.rotation.y = 0;
-          door.position.z = wallItem.wall.position.z + 0.25;
-        } else if (
-          wallItem.wall.position.x + 2 > door.position.x &&
-          wallItem.wall.position.x - 2 < door.position.x &&
-          wallItem.type == 'side' &&
-          wallBox.getMinZ() < door.position.z &&
-          wallBox.getMaxZ() > door.position.z
-        ) {
-          door.rotation.y = Math.PI / 2;
-          door.position.x = wallItem.wall.position.x + 0.25;
-        } else {
-        }
+  countIt++;
+  walls.forEach((wallItem) => {
+    wallItem.resetWall();
+    let wallBox = wallItem.border;
+    doors.forEach((door) => {
+      door.updateMatrix();
+      let doorBox = new WallBorder(door);
+      door.position.y = doorBox.getHeight() / 2 - 0.2;
+      if (
+        wallItem.wall.position.z + 2 > door.position.z &&
+        wallItem.wall.position.z - 2 < door.position.z &&
+        wallItem.type == 'main' &&
+        wallBox.getMinX() < door.position.x &&
+        wallBox.getMaxX() > door.position.x
+      ) {
+        let g = new THREE.BoxBufferGeometry(
+          doorBox.getWidth(),
+          doorBox.getHeight(),
+          doorBox.getDepth() * 2
+        );
+        let m = (door.material as THREE.MeshLambertMaterial).clone();
+        let d = new THREE.Mesh(g, m);
+        door.rotation.y = 0;
+        if (wallItem.name.toLowerCase().includes('outer'))
+          door.position.z = wallItem.wall.position.z;
+        d.position.set(
+          door.position.x - 0.2,
+          door.position.y,
+          wallItem.wall.position.z
+        );
+        d.updateMatrix();
+        wallItem.wall.updateMatrix();
+        const sRes = CSG.subtract(wallItem.wall, d);
+        sRes.name = wallItem.name;
+        sRes.position.set(
+          wallItem.wall.position.x,
+          wallItem.wall.position.y,
+          wallItem.wall.position.z
+        );
+        wallItem.wall.visible = false;
+        scene.remove(wallItem.wall);
+        wallItem.wall = sRes.clone();
+        scene.add(wallItem.wall);
+      } else if (
+        wallItem.wall.position.x + 2 > door.position.x &&
+        wallItem.wall.position.x - 2 < door.position.x &&
+        wallItem.type == 'side' &&
+        wallBox.getMinZ() < door.position.z &&
+        wallBox.getMaxZ() > door.position.z
+      ) {
+        door.rotation.y = Math.PI / 2;
+        if (wallItem.name.toLowerCase().includes('outer'))
+          door.position.x = wallItem.wall.position.x;
+        let g = new THREE.BoxBufferGeometry(
+          doorBox.getWidth() * 2,
+          doorBox.getHeight(),
+          doorBox.getDepth()
+        );
+        let m = (door.material as THREE.MeshLambertMaterial).clone();
+        let d = new THREE.Mesh(g, m);
+        d.position.set(
+          wallItem.wall.position.x,
+          door.position.y,
+          door.position.z + 0.2
+        );
+        d.updateMatrix();
+        wallItem.wall.updateMatrix();
+        const sRes = CSG.subtract(wallItem.wall, d);
+        sRes.name = wallItem.name;
+        sRes.position.set(
+          wallItem.wall.position.x,
+          wallItem.wall.position.y,
+          wallItem.wall.position.z
+        );
+        wallItem.wall.visible = false;
+        scene.remove(wallItem.wall);
+        wallItem.wall = sRes.clone();
+        scene.add(wallItem.wall);
       }
     });
   });
@@ -193,8 +246,8 @@ function adjustWindow() {
     let windowBox: Border = new WallBorder(window);
     walls.forEach((wallItem, idx) => {
       let wallBox = wallItem.border;
+      wallItem.resetWall();
       if (wallBox) {
-        let name = 'wallsub' + wallItem.name;
         if (
           wallItem.wall.position.z + 2 > window.position.z &&
           wallItem.wall.position.z - 2 < window.position.z &&
@@ -202,27 +255,24 @@ function adjustWindow() {
           wallBox.getMinX() < window.position.x &&
           wallBox.getMaxX() > window.position.x
         ) {
-          scene.children
-            .filter((item) => item.name == name)
-            .forEach((item) => scene.remove(item));
-          window.position.z = wallItem.wall.position.z + 0.15;
-          wallItem.wall.updateMatrix();
-          window.updateMatrix();
-
+          let g = new THREE.BoxBufferGeometry(
+            windowBox.getWidth(),
+            windowBox.getHeight(),
+            windowBox.getDepth()
+          );
           const sRes = CSG.subtract(wallItem.wall, window);
-          sRes.name = name;
+          sRes.name = wallItem.name;
           sRes.position.set(
             wallItem.wall.position.x,
             wallItem.wall.position.y,
             wallItem.wall.position.z
           );
+          scene.remove(wallItem.wall);
           wallItem.wall.visible = false;
+          wallItem.wall = sRes;
           scene.add(sRes);
-        } else {
-          scene.children
-            .filter((item) => item.name == name)
-            .forEach((item) => scene.remove(item));
-          wallItem.wall.visible = true;
+          window.rotation.y = 0;
+          window.position.z = wallItem.wall.position.z + 0.1;
         }
       }
     });
@@ -253,34 +303,51 @@ function changeEnvironment(event: THREE.Event) {
       item.object.name.toLowerCase().includes('door') ||
       item.object.name.toLowerCase().includes('window')
     ) {
-      let editBtn = new EditButtton(event.clientX, event.clientY);
-      editBtn.add();
-      setTimeout(() => editBtn.button.remove(), 4000);
+      let buttonPanel = new ButtonPanel(event.clientX, event.clientY);
+      let editBtn = new EditButton();
+      buttonPanel.addButton(editBtn);
+      if (item.object.name.toLowerCase().includes('door')) {
+        let deleteBtn = new DeleteBtn();
+        buttonPanel.addButton(deleteBtn);
+        deleteBtn.getButton().addEventListener('click', () => {
+          let ob = doors.filter((d) => d.id === item.object.id)[0];
+          draggable.splice(draggable.indexOf(ob), 1);
+          doors.splice(doors.indexOf(ob), 1);
+          scene.remove(ob);
+          buttonPanel.remove();
+        });
+      } else if (item.object.name.toLowerCase().includes('window')) {
+        let deleteBtn = new DeleteBtn();
+        buttonPanel.addButton(deleteBtn);
+        deleteBtn.getButton().addEventListener('click', () => {
+          let ob = windows.filter((win) => win.id === item.object.id)[0];
+          console.log(ob);
+
+          draggable.splice(draggable.indexOf(ob), 1);
+          windows.splice(windows.indexOf(ob), 1);
+          scene.remove(ob);
+          buttonPanel.remove();
+        });
+      }
+      buttonPanel.display();
+      setTimeout(() => buttonPanel.remove(), 4000);
       editBtn.button.addEventListener('click', () => {
-        editBtn.button.remove();
+        buttonPanel.remove();
         if (item.object.name.toLowerCase().includes('wall')) {
-          let dialog: HTMLAddElement = new Dialog(
-            item.object as THREE.Mesh,
-            'Wall',
-            meshCache
-          );
+          let dialog = new Dialog(item.object as THREE.Mesh, 'Wall', meshCache);
           dialog.add();
         } else if (item.object.name.toLowerCase().includes('floor')) {
-          let dialog: HTMLAddElement = new Dialog(
+          let dialog = new Dialog(
             item.object as THREE.Mesh,
             'Floor',
             meshCache
           );
           dialog.add();
         } else if (item.object.name.toLowerCase().includes('door')) {
-          let dialog: HTMLAddElement = new Dialog(
-            item.object as THREE.Mesh,
-            'Door',
-            meshCache
-          );
+          let dialog = new Dialog(item.object as THREE.Mesh, 'Door', meshCache);
           dialog.add();
         } else if (item.object.name.toLowerCase().includes('window')) {
-          let dialog: HTMLAddElement = new Dialog(
+          let dialog = new Dialog(
             item.object as THREE.Mesh,
             'Window',
             meshCache
@@ -295,8 +362,10 @@ function changeEnvironment(event: THREE.Event) {
 function animate() {
   requestAnimationFrame(animate);
 
-  if (doors.length > 0) adjustDoor();
-  if (windows.length > 0) adjustWindow();
+  // if (doors.length > 0)
+  adjustDoor();
+  // if (windows.length > 0)
+  adjustWindow();
   controls.update();
   envManager.render();
 
