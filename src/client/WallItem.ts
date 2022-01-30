@@ -18,6 +18,10 @@ export class WallItem {
     return this._wall;
   }
 
+  public set oWall(wallObject: THREE.Mesh) {
+    this._wall = wallObject;
+  }
+
   public get wall() {
     return this._shadowWall;
   }

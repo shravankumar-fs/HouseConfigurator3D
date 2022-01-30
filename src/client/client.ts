@@ -6,15 +6,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EnvironmentManager } from './EnvironmentManager';
 import { WallBorder } from './WallBorder';
 import { Dialog } from './Dialog';
-import { ControlButton } from './ControlButton';
 import { CSG } from 'three-csg-ts';
 import { Border } from './Border';
 import { EditButton } from './EditButton';
 import { Panel } from './Panel';
 import { WallItem } from './WallItem';
-import { BoxBufferGeometry } from 'three';
 import { ButtonPanel } from './buttonPanel';
 import { DeleteBtn } from './DeleteButton';
+import { MeshBasicMaterial, MeshPhongMaterial } from 'three';
+import { ScaleButton } from './ScaleButton';
 
 // const stats = Stats();
 // document.body.appendChild(stats.dom);
@@ -41,6 +41,14 @@ let count = 0;
 const wallBorderMap = new Map<string, WallItem>();
 let panelManager = new Panel();
 panelManager.registerPanelChange();
+let xm = 999,
+  xx = -999,
+  ym = 999,
+  yx = -999,
+  zm = 999,
+  zx = -999;
+
+let house = new THREE.Group();
 
 fbxLoader.load(
   'models/intmodified10.fbx',
@@ -66,8 +74,8 @@ fbxLoader.load(
             mesh.material.color = new THREE.Color(0xdfaf00);
           } else if (mesh.name.toLowerCase().includes('roof')) {
             mesh.material.transparent = true;
-            mesh.material.opacity = 0.5;
-            mesh.material.color = new THREE.Color(0xffffff);
+            mesh.material.opacity = 0.7;
+            mesh.material.color = new THREE.Color(0xffaf00);
           } else {
             mesh.material.color = new THREE.Color(0xffffff);
           }
@@ -76,16 +84,28 @@ fbxLoader.load(
         ++count;
         if (count == 77) {
           walls.forEach((item) => {
-            item.wall.updateMatrix();
+            // item.wall.updateMatrix();
             scene.add(item.wall);
+            house.add(item.wall);
           });
           walls.forEach((item) => {
             wallBorderMap.set(item.name, item);
           });
           objects.forEach((item) => {
-            item.updateMatrix();
+            // item.updateMatrix();
             scene.add(item);
+            house.add(item);
           });
+          walls.forEach((item) => {
+            xm = xm < item.border.xMin ? xm : item.border.xMin;
+            xx = xx > item.border.xMax ? xx : item.border.xMax;
+            ym = ym < item.border.yMin ? ym : item.border.yMin;
+            yx = yx > item.border.yMax ? yx : item.border.yMax;
+            zm = zm < item.border.zMin ? zm : item.border.zMin;
+            zx = zx > item.border.zMax ? zx : item.border.zMax;
+          });
+          addButtons();
+          scene.add(house);
         }
       }
     });
@@ -102,21 +122,81 @@ let windows: THREE.Mesh[] = [];
 let draggable: THREE.Mesh[] = [];
 
 function addWindow() {
-  let g = new THREE.BoxGeometry(2, 2, 1);
-  let m = new THREE.MeshLambertMaterial({
-    color: 0xffffff,
-    transparent: true,
-    opacity: 0.2,
-    side: THREE.DoubleSide,
-  });
-  let window = new THREE.Mesh(g, m);
-  window.name = 'window';
-  window.position.set(0, 11, 0);
-  draggable.push(window);
-  scene.add(window);
-  windows.push(window);
-}
+  fbxLoader.load(
+    'models/window2.fbx',
+    (obj: THREE.Object3D<THREE.Event>) => {
+      // obj.traverse(function (child) {
+      //   if ((child as THREE.Mesh).isMesh) {
+      //     let door = child as THREE.Mesh;
+      //     // door.name = 'door';
+      //     // (door.material as THREE.MeshLambertMaterial).color = new THREE.Color(
+      //     //   0xff0000
+      //     // );
+      //     (door.material as THREE.MeshLambertMaterial).side = THREE.DoubleSide;
+      //     (door.material as THREE.MeshLambertMaterial).needsUpdate = true;
+      //     door.position.set(5, 5, 15);
+      //     draggable.push(door);
+      //     scene.add(door);
+      //     windows.push(door);
+      //   }
+      // });
+      // obj.traverse(function (child) {
+      //   if ((child as THREE.Mesh).isMesh) {
+      //     (child as THREE.Mesh).material = new THREE.MeshBasicMaterial({
+      //       color: 0xffffff,
+      //     });
+      //     scene.add(child as THREE.Mesh);
+      //   }
+      // });
+      // obj.position.set(0, 10, 10);
+      // obj.scale.addScalar(100);
+      // scene.add(obj);
+      // console.log(obj);
+    },
+    // (obj: THREE.Object3D<THREE.Event>) => {
+    //   // let windowMain = new THREE.Object3D();
+    //   obj.traverse(function (child) {
+    //     if ((child as THREE.Mesh).isMesh) {
+    //       let window = child as THREE.Mesh;
+    //       (window.material as THREE.MeshLambertMaterial).side =
+    //         THREE.DoubleSide;
+    //       (window.material as THREE.MeshLambertMaterial).needsUpdate = true;
+    //       window.scale.set(0.1, 0.1, 0.01);
+    //       window.position.set(5, 5, 15);
+    //       draggable.push(window);
+    //       scene.add(window);
+    //       windows.push(window);
+    //       // windowMain.add(window);
+    //       // console.log(window, windowMain);
+    //     }
+    //   });
 
+    // obj.children.forEach((item) => {
+    //   if ((item as THREE.Mesh).isMesh) {
+    //     windowMain.add(item);
+    //   }
+    // });
+    // console.log(windowMain);
+    // windowMain.name = 'window';
+    // // (window.material as THREE.MeshLambertMaterial).side =
+    // //   THREE.DoubleSide;
+    // // (window.material as THREE.MeshLambertMaterial).needsUpdate = true;
+    // // window.scale.set(0, 0.1, 0.01);
+    // windowMain.position.set(5, 5, 15);
+    // // draggable.push(window);
+    // scene.add(windowMain);
+    // // console.log(windowMain);
+
+    // // windows.push(window);
+    // },
+    (xhr) => {
+      console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+}
 function addDoor() {
   fbxLoader.load(
     'models/door.fbx',
@@ -132,7 +212,7 @@ function addDoor() {
           (door.material as THREE.MeshLambertMaterial).needsUpdate = true;
           door.position.set(5, 5, 15);
           draggable.push(door);
-          scene.add(door);
+          house.add(door);
           doors.push(door);
         }
       });
@@ -150,7 +230,51 @@ const dControls = new DragControls(draggable, camera, renderer.domElement);
 dControls.addEventListener('dragstart', function (event) {
   controls.enabled = false;
 });
-
+let mapScale = new Map<string, ScaleButton>();
+dControls.addEventListener('drag', (event) => {
+  let eventObject = event.object as THREE.Mesh;
+  if (eventObject.name.includes('scaleBtn')) {
+    let b = mapScale.get(eventObject.name);
+    if (b) {
+      if (b.type === 'z') {
+        eventObject.position.x = 0;
+        eventObject.position.y = 0;
+        if (eventObject.position.z < b.getMin()) {
+          eventObject.position.z = b.getMin();
+        }
+        if (eventObject.position.z > b.getMax()) {
+          eventObject.position.z = b.getMax();
+        }
+        b.presentDistance = b.getDistance();
+        let delta = b.presentDistance - b.pastDistance;
+        house.updateMatrix();
+        house.scale.z += delta / 12;
+        b.pastDistance = b.presentDistance;
+      } else if (b.type === 'x') {
+        eventObject.position.z = 0;
+        eventObject.position.y = 0;
+        if (eventObject.position.x < b.getMin()) {
+          eventObject.position.x = b.getMin();
+        }
+        if (eventObject.position.x > b.getMax()) {
+          eventObject.position.x = b.getMax();
+        }
+        b.presentDistance = b.getDistance();
+        let delta = b.presentDistance - b.pastDistance;
+        house.updateMatrix();
+        house.scale.x += delta / 12;
+        house.children
+          .filter((item) => item.name.toLowerCase().includes('wall'))
+          .forEach((item) => {
+            let itemClone = (item as THREE.Mesh).clone();
+            walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
+            walls.filter((i) => i.name === item.name)[0].wall = itemClone;
+          });
+        b.pastDistance = b.presentDistance;
+      }
+    }
+  }
+});
 dControls.addEventListener('dragend', function (event) {
   controls.enabled = true;
 });
@@ -180,8 +304,7 @@ function adjustDoor() {
         let m = (door.material as THREE.MeshLambertMaterial).clone();
         let d = new THREE.Mesh(g, m);
         door.rotation.y = 0;
-        if (wallItem.name.toLowerCase().includes('outer'))
-          door.position.z = wallItem.wall.position.z;
+        door.position.z = wallItem.wall.position.z;
         d.position.set(
           door.position.x - 0.2,
           door.position.y,
@@ -197,9 +320,9 @@ function adjustDoor() {
           wallItem.wall.position.z
         );
         wallItem.wall.visible = false;
-        scene.remove(wallItem.wall);
+        house.remove(wallItem.wall);
         wallItem.wall = sRes.clone();
-        scene.add(wallItem.wall);
+        house.add(wallItem.wall);
       } else if (
         wallItem.wall.position.x + 2 > door.position.x &&
         wallItem.wall.position.x - 2 < door.position.x &&
@@ -232,9 +355,9 @@ function adjustDoor() {
           wallItem.wall.position.z
         );
         wallItem.wall.visible = false;
-        scene.remove(wallItem.wall);
+        house.remove(wallItem.wall);
         wallItem.wall = sRes.clone();
-        scene.add(wallItem.wall);
+        house.add(wallItem.wall);
       }
     });
   });
@@ -292,10 +415,12 @@ function changeEnvironment(event: THREE.Event) {
 
   raycaster.setFromCamera(mouse, camera);
   const intersects: THREE.Intersection[] = raycaster.intersectObjects(
-    scene.children
+    house.children
   );
 
   if (intersects.length > 0) {
+    console.log(intersects);
+
     let item = intersects[0];
     if (
       item.object.name.toLowerCase().includes('wall') ||
@@ -306,6 +431,7 @@ function changeEnvironment(event: THREE.Event) {
       let buttonPanel = new ButtonPanel(event.clientX, event.clientY);
       let editBtn = new EditButton();
       buttonPanel.addButton(editBtn);
+
       if (item.object.name.toLowerCase().includes('door')) {
         let deleteBtn = new DeleteBtn();
         buttonPanel.addButton(deleteBtn);
@@ -358,21 +484,76 @@ function changeEnvironment(event: THREE.Event) {
     }
   }
 }
-
+// let buttons: THREE.Mesh[] = [];
 function animate() {
   requestAnimationFrame(animate);
 
-  // if (doors.length > 0)
   adjustDoor();
-  // if (windows.length > 0)
   adjustWindow();
   controls.update();
   envManager.render();
-
-  // stats.update();
 }
-
+function adjustItem() {}
 animate();
-
 document.getElementById('addDoor')?.addEventListener('click', addDoor);
 document.getElementById('addWindow')?.addEventListener('click', addWindow);
+
+function addButtons() {
+  {
+    let mc = createScaleButton();
+    mc.name = 'scaleBtn1';
+    mc.position.set(0, 0.1, zx + 4);
+    mc.rotation.x += Math.PI / 2;
+    mc.rotation.z -= Math.PI / 2;
+    scene.add(mc);
+    draggable.push(mc);
+    let sb = new ScaleButton(mc, zx + 4, zx + 9, 'z');
+    mapScale.set('scaleBtn1', sb);
+  }
+  {
+    let mc = createScaleButton();
+    mc.name = 'scaleBtn2';
+    mc.position.set(xx + 4, 0.1, 0);
+    mc.rotation.x += Math.PI / 2;
+    mc.rotation.y += Math.PI;
+    scene.add(mc);
+    draggable.push(mc);
+    let sb = new ScaleButton(mc, xx + 4, xx + 9, 'x');
+    mapScale.set('scaleBtn2', sb);
+  }
+}
+
+function createScaleButton(): THREE.Mesh {
+  let g1 = new THREE.PlaneGeometry(2, 2, 100, 100);
+  let m1 = new MeshBasicMaterial({
+    color: 0x00ff00,
+    map: new THREE.TextureLoader().load('images/arrow.png'),
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.9,
+  });
+  let mc = new THREE.Mesh(g1, m1);
+  return mc;
+}
+
+// dControls.addEventListener('drag')
+// document.getElementById('canvas')?.addEventListener('drag', (event) => {
+//   event.preventDefault();
+
+//   const mouse = {
+//     x: (event.clientX / renderer.domElement.clientWidth) * 2 - 1,
+//     y: -(event.clientY / renderer.domElement.clientHeight) * 2 + 1,
+//   };
+
+//   raycaster.setFromCamera(mouse, camera);
+//   const intersects: THREE.Intersection[] = raycaster.intersectObjects(
+//     scene.children
+//   );
+
+//   if (intersects.length > 0) {
+//     let item = intersects[0];
+//     if (item.object.name == 'scaleBtn') {
+//       console.log('im here');
+//     }
+//   }
+// });

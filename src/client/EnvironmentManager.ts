@@ -65,9 +65,12 @@ export class EnvironmentManager {
     if (canvas) {
       this._renderer = new THREE.WebGLRenderer({
         canvas: canvas,
+        antialias: true,
       });
     } else {
-      this._renderer = new THREE.WebGLRenderer();
+      this._renderer = new THREE.WebGLRenderer({
+        antialias: true,
+      });
     }
     this._renderer.setSize(window.innerWidth, window.innerHeight);
   }
