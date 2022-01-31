@@ -1,4 +1,4 @@
-export class Panel {
+export class MainPanel {
   constructor() {}
 
   public registerPanelChange() {

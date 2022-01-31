@@ -2,22 +2,20 @@ import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { DragControls } from 'three/examples/jsm/controls/DragControls';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { CSG } from 'three-csg-ts';
 
 import { EnvironmentManager } from './EnvironmentManager';
-import { WallBorder } from './WallBorder';
-import { Dialog } from './Dialog';
-import { CSG } from 'three-csg-ts';
-import { Border } from './Border';
-import { EditButton } from './EditButton';
-import { Panel } from './Panel';
-import { WallItem } from './WallItem';
-import { ButtonPanel } from './buttonPanel';
-import { DeleteBtn } from './DeleteButton';
-import { MeshBasicMaterial, MeshPhongMaterial } from 'three';
-import { ScaleButton } from './ScaleButton';
-import { WindowElement } from './WindowElement';
-import { AnimateButton } from './animateButton';
-import { DialogWindow } from './DialogWindow';
+import { WallBorder } from './Models/WallBorder';
+import { EditPanel } from './Controllers/EditPanel';
+import { EditButton } from './Controllers/Control/EditButton';
+import { MainPanel } from './Controllers/MainPanel';
+import { WallItem } from './Models/WallItem';
+import { ButtonPanel } from './Controllers/ButtonPanel';
+import { DeleteBtn } from './Controllers/Control/DeleteButton';
+import { ScaleButton } from './Controllers/Scale/ScaleButton';
+import { WindowBorder } from './Models/WindowBorder';
+import { AnimateButton } from './Controllers/Control/AnimateButton';
+import { DialogWindow } from './Controllers/EditPanelWindow';
 
 let envManager = new EnvironmentManager();
 let scene = envManager.scene;
@@ -40,7 +38,7 @@ const fbxLoader = new FBXLoader();
 let objects: THREE.Mesh[] = [];
 let count = 0;
 const wallBorderMap = new Map<string, WallItem>();
-let panelManager = new Panel();
+let panelManager = new MainPanel();
 panelManager.registerPanelChange();
 let xm = 999,
   xx = -999,
@@ -98,12 +96,12 @@ fbxLoader.load(
             house.add(item);
           });
           walls.forEach((item) => {
-            xm = xm < item.border.xMin ? xm : item.border.xMin;
-            xx = xx > item.border.xMax ? xx : item.border.xMax;
-            ym = ym < item.border.yMin ? ym : item.border.yMin;
-            yx = yx > item.border.yMax ? yx : item.border.yMax;
-            zm = zm < item.border.zMin ? zm : item.border.zMin;
-            zx = zx > item.border.zMax ? zx : item.border.zMax;
+            xm = xm < item.border.getMinX() ? xm : item.border.getMinX();
+            ym = ym < item.border.getMinY() ? ym : item.border.getMinY();
+            zm = zm < item.border.getMinZ() ? zm : item.border.getMinZ();
+            xx = xx > item.border.getMaxX() ? xx : item.border.getMaxX();
+            yx = yx > item.border.getMaxY() ? yx : item.border.getMaxY();
+            zx = zx > item.border.getMaxZ() ? zx : item.border.getMaxZ();
           });
           addButtons();
           scene.add(house);
@@ -215,11 +213,12 @@ dControls.addEventListener('dragend', function (event) {
 let mapScale = new Map<string, ScaleButton>();
 dControls.addEventListener('drag', (event) => {
   let eventObject = event.object as THREE.Mesh;
-
-  if (eventObject.name.includes('scaleBtn')) {
+  if (eventObject.name.toLowerCase().includes('scale')) {
     let b = mapScale.get(eventObject.name);
+    console.log('ok');
     if (b) {
       if (b.type === 'z') {
+        console.log('ok1');
         eventObject.position.x = 0;
         eventObject.position.y = 0;
         if (eventObject.position.z < b.getMin()) {
@@ -232,8 +231,16 @@ dControls.addEventListener('drag', (event) => {
         let delta = b.presentDistance - b.pastDistance;
         house.updateMatrix();
         house.scale.z += delta / 12;
+        house.children
+          .filter((item) => item.name.toLowerCase().includes('wall'))
+          .forEach((item) => {
+            let itemClone = (item as THREE.Mesh).clone();
+            walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
+            walls.filter((i) => i.name === item.name)[0].wall = itemClone;
+          });
         b.pastDistance = b.presentDistance;
       } else if (b.type === 'x') {
+        console.log('ok2');
         eventObject.position.z = 0;
         eventObject.position.y = 0;
         if (eventObject.position.x < b.getMin()) {
@@ -267,10 +274,12 @@ function adjustDoorAndWindow() {
       item.updateMatrix();
       let boundaryBox;
       if (item.name.toLowerCase().includes('window')) {
-        boundaryBox = new WindowElement(item as THREE.Group);
+        boundaryBox = new WindowBorder(item as THREE.Group);
         item.position.y = item.position.y < 0 ? 2 : item.position.y;
         item.position.y =
-          item.position.y > wallBox.yMax ? wallBox.yMax - 2 : item.position.y;
+          item.position.y > wallBox.getMaxY()
+            ? wallBox.getMaxY() - 2
+            : item.position.y;
       } else {
         boundaryBox = new WallBorder(item as THREE.Mesh);
         item.position.y = boundaryBox.getHeight() / 2 - 0.2;
@@ -462,17 +471,25 @@ function changeEnvironment(event: THREE.Event) {
       editBtn.button.addEventListener('click', () => {
         buttonPanel.remove();
         if (item.object.name.toLowerCase().includes('wall')) {
-          let dialog = new Dialog(item.object as THREE.Mesh, 'Wall', meshCache);
+          let dialog = new EditPanel(
+            item.object as THREE.Mesh,
+            'Wall',
+            meshCache
+          );
           dialog.add();
         } else if (item.object.name.toLowerCase().includes('floor')) {
-          let dialog = new Dialog(
+          let dialog = new EditPanel(
             item.object as THREE.Mesh,
             'Floor',
             meshCache
           );
           dialog.add();
         } else if (item.object.name.toLowerCase().includes('door')) {
-          let dialog = new Dialog(item.object as THREE.Mesh, 'Door', meshCache);
+          let dialog = new EditPanel(
+            item.object as THREE.Mesh,
+            'Door',
+            meshCache
+          );
           dialog.add();
         } else if (item.object.parent?.name.toLowerCase().includes('window')) {
           let dialog = new DialogWindow(
@@ -499,38 +516,23 @@ document.getElementById('addWindow')?.addEventListener('click', addWindow);
 
 function addButtons() {
   {
-    let mc = createScaleButton();
-    mc.name = 'scaleBtn1';
-    mc.position.set(0, 0.1, zx + 4);
-    mc.rotation.x += Math.PI / 2;
-    mc.rotation.z -= Math.PI / 2;
-    scene.add(mc);
-    draggable.push(mc);
-    let sb = new ScaleButton(mc, zx + 4, zx + 9, 'z');
-    mapScale.set('scaleBtn1', sb);
+    let scaleButton = new ScaleButton('scaleBtn1', xx + 4, xx + 9, 'z');
+    let button = scaleButton.getButton();
+    button.position.set(0, 0.1, zx + 4);
+    button.rotation.x += Math.PI / 2;
+    button.rotation.z -= Math.PI / 2;
+    scene.add(button);
+    draggable.push(button);
+    mapScale.set(button.name, scaleButton);
   }
   {
-    let mc = createScaleButton();
-    mc.name = 'scaleBtn2';
-    mc.position.set(xx + 4, 0.1, 0);
-    mc.rotation.x += Math.PI / 2;
-    mc.rotation.y += Math.PI;
-    scene.add(mc);
-    draggable.push(mc);
-    let sb = new ScaleButton(mc, xx + 4, xx + 9, 'x');
-    mapScale.set('scaleBtn2', sb);
+    let scaleButton = new ScaleButton('scaleBtn2', xx + 4, xx + 9, 'x');
+    let button = scaleButton.getButton();
+    button.position.set(xx + 4, 0.1, 0);
+    button.rotation.x += Math.PI / 2;
+    button.rotation.y += Math.PI;
+    scene.add(button);
+    draggable.push(button);
+    mapScale.set(button.name, scaleButton);
   }
-}
-
-function createScaleButton(): THREE.Mesh {
-  let g1 = new THREE.PlaneGeometry(2, 2, 100, 100);
-  let m1 = new MeshBasicMaterial({
-    color: 0x00ff00,
-    map: new THREE.TextureLoader().load('images/arrow.png'),
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.9,
-  });
-  let mc = new THREE.Mesh(g1, m1);
-  return mc;
 }

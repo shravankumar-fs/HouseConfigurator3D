@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-export class Dialog {
+export class EditPanel {
   meshItem: THREE.Mesh;
   constructor(
     item: THREE.Mesh,

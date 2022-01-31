@@ -7,12 +7,12 @@ export class WallBorder implements Border {
   private width: number = 0;
   private height: number = 0;
   private depth: number = 0;
-  public xMin: number = 0;
-  public xMax: number = 0;
-  public yMin: number = 0;
-  public yMax: number = 0;
-  public zMin: number = 0;
-  public zMax: number = 0;
+  private xMin: number = 0;
+  private xMax: number = 0;
+  private yMin: number = 0;
+  private yMax: number = 0;
+  private zMin: number = 0;
+  private zMax: number = 0;
 
   constructor(wall: THREE.Mesh) {
     wall.geometry.computeBoundingBox();

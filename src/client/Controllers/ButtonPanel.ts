@@ -1,4 +1,4 @@
-import { ControlButton } from './ControlButton';
+import { ControlButton } from './Control/ControlButton';
 
 export class ButtonPanel {
   buttonList: ControlButton[] = [];

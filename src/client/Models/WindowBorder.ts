@@ -1,6 +1,7 @@
+import { Border } from './Border';
 import { WallBorder } from './WallBorder';
 
-export class WindowElement {
+export class WindowBorder implements Border {
   public name: string;
   public wbs: WallBorder[] = [];
 
@@ -27,13 +28,13 @@ export class WindowElement {
 
   private calculateBounds() {
     this.wbs.forEach((wb) => {
-      this.xMin = wb.xMin < this.xMin ? wb.xMin : this.xMin;
-      this.yMin = wb.yMin < this.yMin ? wb.yMin : this.yMin;
-      this.zMin = wb.zMin < this.zMin ? wb.zMin : this.zMin;
+      this.xMin = wb.getMinX() < this.xMin ? wb.getMinX() : this.xMin;
+      this.yMin = wb.getMinY() < this.yMin ? wb.getMinY() : this.yMin;
+      this.zMin = wb.getMinZ() < this.zMin ? wb.getMinZ() : this.zMin;
 
-      this.xMax = wb.xMax > this.xMax ? wb.xMax : this.xMax;
-      this.yMax = wb.yMax > this.yMax ? wb.yMax : this.yMax;
-      this.zMax = wb.zMax > this.zMax ? wb.zMax : this.zMax;
+      this.xMax = wb.getMaxX() > this.xMax ? wb.getMaxX() : this.xMax;
+      this.yMax = wb.getMaxY() > this.yMax ? wb.getMaxY() : this.yMax;
+      this.zMax = wb.getMaxZ() > this.zMax ? wb.getMaxZ() : this.zMax;
 
       this.width = this.xMax - this.xMin;
       this.height = this.yMax - this.yMin;
@@ -51,5 +52,24 @@ export class WindowElement {
 
   getDepth(): number {
     return this.depth;
+  }
+
+  getMinX(): number {
+    return this.xMin;
+  }
+  getMaxX(): number {
+    return this.xMax;
+  }
+  getMinY(): number {
+    return this.yMin;
+  }
+  getMaxY(): number {
+    return this.yMax;
+  }
+  getMinZ(): number {
+    return this.zMin;
+  }
+  getMaxZ(): number {
+    return this.zMax;
   }
 }

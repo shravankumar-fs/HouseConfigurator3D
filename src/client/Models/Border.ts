@@ -1,5 +1,4 @@
 export interface Border {
-  getBoundingBox(): THREE.Box3;
   getWidth(): number;
   getHeight(): number;
   getDepth(): number;
