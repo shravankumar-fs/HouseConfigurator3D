@@ -1,8 +1,13 @@
 import * as THREE from 'three';
 
-export class DialogWindow {
+export class EditPanelGroup {
   meshItem: THREE.Group;
-  constructor(item: THREE.Group, private type: string) {
+  constructor(
+    item: THREE.Group,
+    private type: string,
+    private editElement: string,
+    private singleMesh?: boolean
+  ) {
     this.meshItem = item;
   }
 
@@ -69,14 +74,26 @@ export class DialogWindow {
             let childObj = child as THREE.Mesh;
             if (childObj.isMesh) {
               if (
-                (childObj.material as THREE.MeshLambertMaterial[]).length > 0
+                (childObj.material as THREE.MeshLambertMaterial[]).length > 1
               ) {
                 (childObj.material as THREE.MeshLambertMaterial[])
-                  .filter((item) => item.name.toLowerCase().includes('frame'))
+                  .filter((item) =>
+                    item.name.toLowerCase().includes(this.editElement)
+                  )
                   .forEach((mat) => {
                     mat.map = text;
                     mat.needsUpdate = true;
                   });
+              } else if (
+                childObj.name.toLowerCase().includes(this.editElement)
+              ) {
+                let text = new THREE.TextureLoader().load(selectedTexture);
+                text.wrapS = THREE.RepeatWrapping;
+                text.wrapT = THREE.RepeatWrapping;
+                // text.repeat.set(6, 6);
+                (childObj.material as THREE.MeshLambertMaterial).map = text;
+                (childObj.material as THREE.MeshLambertMaterial).needsUpdate =
+                  true;
               }
             }
           });
@@ -85,14 +102,23 @@ export class DialogWindow {
             let childObj = child as THREE.Mesh;
             if (childObj.isMesh) {
               if (
-                (childObj.material as THREE.MeshLambertMaterial[]).length > 0
+                (childObj.material as THREE.MeshLambertMaterial[]).length > 1
               ) {
                 (childObj.material as THREE.MeshLambertMaterial[])
-                  .filter((item) => item.name.toLowerCase().includes('frame'))
+                  .filter((item) =>
+                    item.name.toLowerCase().includes(this.editElement)
+                  )
                   .forEach((mat) => {
                     mat.map = null;
                     mat.needsUpdate = true;
                   });
+              } else if (
+                childObj.name.toLowerCase().includes(this.editElement)
+              ) {
+                // text.repeat.set(6, 6);
+                (childObj.material as THREE.MeshLambertMaterial).map = null;
+                (childObj.material as THREE.MeshLambertMaterial).needsUpdate =
+                  true;
               }
             }
           });
@@ -102,13 +128,20 @@ export class DialogWindow {
         this.meshItem.traverse((child) => {
           let childObj = child as THREE.Mesh;
           if (childObj.isMesh) {
-            if ((childObj.material as THREE.MeshLambertMaterial[]).length > 0) {
+            if ((childObj.material as THREE.MeshLambertMaterial[]).length > 1) {
               (childObj.material as THREE.MeshLambertMaterial[])
-                .filter((item) => item.name.toLowerCase().includes('frame'))
+                .filter((item) =>
+                  item.name.toLowerCase().includes(this.editElement)
+                )
                 .forEach((mat) => {
                   mat.color = new THREE.Color(selectedColor);
                   mat.needsUpdate = true;
                 });
+            } else if (childObj.name.toLowerCase().includes(this.editElement)) {
+              (childObj.material as THREE.MeshLambertMaterial).color =
+                new THREE.Color(selectedColor);
+              (childObj.material as THREE.MeshLambertMaterial).needsUpdate =
+                true;
             }
           }
         });

@@ -15,7 +15,7 @@ import { DeleteBtn } from './Controllers/Control/DeleteButton';
 import { ScaleButton } from './Controllers/Scale/ScaleButton';
 import { WindowBorder } from './Models/WindowBorder';
 import { AnimateButton } from './Controllers/Control/AnimateButton';
-import { DialogWindow } from './Controllers/EditPanelWindow';
+import { EditPanelGroup } from './Controllers/EditPanelWindow';
 
 let envManager = new EnvironmentManager();
 let scene = envManager.scene;
@@ -122,9 +122,9 @@ let draggableCache: THREE.Object3D[] = [];
 
 function addWindow() {
   fbxLoader.load(
-    'models/window_2.fbx',
+    'models/window_1.fbx',
     (window: THREE.Object3D) => {
-      window.position.set(0, 5, 10);
+      window.position.set(10, 3, 10);
       window.traverse((child) => {
         if ((child as THREE.Mesh).isMesh) {
           child.position.x = 0;
@@ -489,9 +489,10 @@ function changeEnvironment(event: THREE.Event) {
           );
           dialog.add();
         } else if (item.object.parent?.name.toLowerCase().includes('window')) {
-          let dialog = new DialogWindow(
+          let dialog = new EditPanelGroup(
             item.object.parent as THREE.Group,
-            'Window'
+            'Window',
+            'frame'
           );
           dialog.add();
         }
@@ -547,3 +548,14 @@ function createScaleButton(name: string): THREE.Mesh {
   mc.name = name;
   return mc;
 }
+
+let mass = ['none', 'outer_wall', 'inner_wall'];
+document.getElementById('massSel')?.addEventListener('change', () => {
+  let selected =
+    mass[+(document.getElementById('massSel') as HTMLSelectElement).value];
+  if (selected != 'none') {
+    let name = selected.replace('_', ' ');
+    let dialog = new EditPanelGroup(house, name, selected, true);
+    dialog.add();
+  }
+});
