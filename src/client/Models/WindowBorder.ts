@@ -8,12 +8,12 @@ export class WindowBorder implements Border {
   private width: number = -9999;
   private height: number = -9999;
   private depth: number = -9999;
-  public xMin: number = 9999;
-  public xMax: number = -9999;
-  public yMin: number = 9999;
-  public yMax: number = -9999;
-  public zMin: number = 9999;
-  public zMax: number = -9999;
+  private xMin: number = 9999;
+  private xMax: number = -9999;
+  private yMin: number = 9999;
+  private yMax: number = -9999;
+  private zMin: number = 9999;
+  private zMax: number = -9999;
 
   constructor(public _window: THREE.Group) {
     this.name = _window.name;

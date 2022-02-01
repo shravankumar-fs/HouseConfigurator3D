@@ -213,55 +213,52 @@ dControls.addEventListener('dragend', function (event) {
 let mapScale = new Map<string, ScaleButton>();
 dControls.addEventListener('drag', (event) => {
   let eventObject = event.object as THREE.Mesh;
-  if (eventObject.name.toLowerCase().includes('scale')) {
-    let b = mapScale.get(eventObject.name);
-    console.log('ok');
-    if (b) {
-      if (b.type === 'z') {
-        console.log('ok1');
-        eventObject.position.x = 0;
-        eventObject.position.y = 0;
-        if (eventObject.position.z < b.getMin()) {
-          eventObject.position.z = b.getMin();
-        }
-        if (eventObject.position.z > b.getMax()) {
-          eventObject.position.z = b.getMax();
-        }
-        b.presentDistance = b.getDistance();
-        let delta = b.presentDistance - b.pastDistance;
-        house.updateMatrix();
-        house.scale.z += delta / 12;
-        house.children
-          .filter((item) => item.name.toLowerCase().includes('wall'))
-          .forEach((item) => {
-            let itemClone = (item as THREE.Mesh).clone();
-            walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
-            walls.filter((i) => i.name === item.name)[0].wall = itemClone;
-          });
-        b.pastDistance = b.presentDistance;
-      } else if (b.type === 'x') {
-        console.log('ok2');
-        eventObject.position.z = 0;
-        eventObject.position.y = 0;
-        if (eventObject.position.x < b.getMin()) {
-          eventObject.position.x = b.getMin();
-        }
-        if (eventObject.position.x > b.getMax()) {
-          eventObject.position.x = b.getMax();
-        }
-        b.presentDistance = b.getDistance();
-        let delta = b.presentDistance - b.pastDistance;
-        house.updateMatrix();
-        house.scale.x += delta / 12;
-        house.children
-          .filter((item) => item.name.toLowerCase().includes('wall'))
-          .forEach((item) => {
-            let itemClone = (item as THREE.Mesh).clone();
-            walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
-            walls.filter((i) => i.name === item.name)[0].wall = itemClone;
-          });
-        b.pastDistance = b.presentDistance;
+  let b = mapScale.get(eventObject.name);
+  if (b) {
+    if (b.type === 'z') {
+      eventObject.position.x = 0;
+      eventObject.position.y = 0;
+      if (eventObject.position.z < b.getMin()) {
+        eventObject.position.z = b.getMin();
       }
+      if (eventObject.position.z > b.getMax()) {
+        eventObject.position.z = b.getMax();
+      }
+      b.presentDistance = b.getDistance();
+      let delta = b.presentDistance - b.pastDistance;
+      console.log(b.presentDistance, b.pastDistance);
+
+      house.updateMatrix();
+      house.scale.z += delta / 12;
+      house.children
+        .filter((item) => item.name.toLowerCase().includes('wall'))
+        .forEach((item) => {
+          let itemClone = (item as THREE.Mesh).clone();
+          walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
+          walls.filter((i) => i.name === item.name)[0].wall = itemClone;
+        });
+      b.pastDistance = b.presentDistance;
+    } else if (b.type === 'x') {
+      eventObject.position.z = 0;
+      eventObject.position.y = 0;
+      if (eventObject.position.x < b.getMin()) {
+        eventObject.position.x = b.getMin();
+      }
+      if (eventObject.position.x > b.getMax()) {
+        eventObject.position.x = b.getMax();
+      }
+      b.presentDistance = b.getDistance();
+      let delta = b.presentDistance - b.pastDistance;
+      house.updateMatrix();
+      house.scale.x += delta / 12;
+      house.children
+        .filter((item) => item.name.toLowerCase().includes('wall'))
+        .forEach((item) => {
+          let itemClone = (item as THREE.Mesh).clone();
+          walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
+          walls.filter((i) => i.name === item.name)[0].wall = itemClone;
+        });
+      b.pastDistance = b.presentDistance;
     }
   }
 });
@@ -516,23 +513,37 @@ document.getElementById('addWindow')?.addEventListener('click', addWindow);
 
 function addButtons() {
   {
-    let scaleButton = new ScaleButton('scaleBtn1', xx + 4, xx + 9, 'z');
-    let button = scaleButton.getButton();
-    button.position.set(0, 0.1, zx + 4);
-    button.rotation.x += Math.PI / 2;
-    button.rotation.z -= Math.PI / 2;
-    scene.add(button);
-    draggable.push(button);
-    mapScale.set(button.name, scaleButton);
-  }
-  {
-    let scaleButton = new ScaleButton('scaleBtn2', xx + 4, xx + 9, 'x');
-    let button = scaleButton.getButton();
-    button.position.set(xx + 4, 0.1, 0);
+    let button = createScaleButton('scaleBtn1');
+    button.position.set(xx + 5, 0.1, 0);
     button.rotation.x += Math.PI / 2;
     button.rotation.y += Math.PI;
     scene.add(button);
     draggable.push(button);
+    let scaleButton = new ScaleButton(button, xx + 5, xx + 9, 'x');
     mapScale.set(button.name, scaleButton);
   }
+  {
+    let button = createScaleButton('scaleBtn2');
+    button.position.set(0, 0.1, zx + 5);
+    button.rotation.x += Math.PI / 2;
+    button.rotation.z -= Math.PI / 2;
+    scene.add(button);
+    draggable.push(button);
+    let scaleButton = new ScaleButton(button, zx + 5, zx + 9, 'z');
+    mapScale.set(button.name, scaleButton);
+  }
+}
+
+function createScaleButton(name: string): THREE.Mesh {
+  let g1 = new THREE.PlaneGeometry(2, 2, 100, 100);
+  let m1 = new THREE.MeshBasicMaterial({
+    color: 0x00ff00,
+    map: new THREE.TextureLoader().load('images/arrow.png'),
+    side: THREE.DoubleSide,
+    transparent: true,
+    opacity: 0.9,
+  });
+  let mc = new THREE.Mesh(g1, m1);
+  mc.name = name;
+  return mc;
 }
