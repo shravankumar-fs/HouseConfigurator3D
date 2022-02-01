@@ -46,7 +46,7 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    this._scene.fog = new THREE.Fog(0x001f00, 50, 200);
+    this._scene.fog = new THREE.Fog(0x001f00, 10, 200);
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
 
@@ -55,7 +55,7 @@ export class EnvironmentManager {
       75,
       window.innerWidth / window.innerHeight,
       0.1,
-      1000
+      200
     );
     this._camera.position.set(0, 10, 25);
   }
@@ -76,7 +76,7 @@ export class EnvironmentManager {
   }
 
   addGround() {
-    let groundG = new THREE.CircleBufferGeometry(200, 1000);
+    let groundG = new THREE.CircleBufferGeometry(250, 1000);
     let tex = new THREE.TextureLoader().load('images/grass.jpg');
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
