@@ -22,6 +22,7 @@ let scene = envManager.scene;
 let renderer = envManager.renderer;
 let camera = envManager.camera;
 document.body.appendChild(renderer.domElement);
+
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.minPolarAngle = Math.PI / 10;
 controls.maxPolarAngle = Math.PI / 2.2;
@@ -31,6 +32,8 @@ controls.enableDamping = true;
 controls.dampingFactor = 0.1;
 controls.enablePan = false;
 controls.screenSpacePanning = false;
+controls.target.set(5, 5, 0);
+
 window.addEventListener('resize', () => envManager.onWindowResize(), false);
 
 let walls: WallItem[] = [];
@@ -122,7 +125,7 @@ let draggableCache: THREE.Object3D[] = [];
 
 function addWindow() {
   fbxLoader.load(
-    'models/window_1.fbx',
+    'models/window_2.fbx',
     (window: THREE.Object3D) => {
       window.position.set(10, 3, 10);
       window.traverse((child) => {
@@ -501,11 +504,23 @@ function changeEnvironment(event: THREE.Event) {
   }
 }
 
+let time = 40;
+let prev = Date.now();
 function animate() {
-  requestAnimationFrame(animate);
+  let nTime = Date.now();
+  let delta = nTime - prev;
+  prev = nTime;
+  // Schedule the next frame.
+  if (delta > time) requestAnimationFrame(animate);
+  else
+    setTimeout(() => {
+      requestAnimationFrame(animate);
+    }, time - delta);
+
   adjustDoorAndWindow();
   controls.update();
-  envManager.render();
+
+  if (Math.random() > 0.8) envManager.render();
 }
 
 animate();

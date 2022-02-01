@@ -221,7 +221,7 @@ canvas {
   --len: 100px;
   height: var(--len);
   width: var(--len);
-  --border-control: 4px red double;
+  --border-control: 4px green double;
   --border-control-radius: 50%;
   border: var(--border-control);
   transform: translate(-50%, -50%);
