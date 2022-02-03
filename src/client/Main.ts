@@ -51,10 +51,17 @@ let xm = 999,
   zx = -999;
 
 let house = new THREE.Group();
-
+house.name = 'house';
 fbxLoader.load(
   'models/interior.fbx',
   (obj) => {
+    let c = 0;
+    obj.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        c++;
+      }
+    });
+
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         let mesh = child as THREE.Mesh<
@@ -84,18 +91,14 @@ fbxLoader.load(
           objects.push(mesh);
         }
         ++count;
-        if (count == 77) {
+        if (count == c) {
           walls.forEach((item) => {
-            // item.wall.updateMatrix();
-            // scene.add(item.wall);
             house.add(item.wall);
           });
           walls.forEach((item) => {
             wallBorderMap.set(item.name, item);
           });
           objects.forEach((item) => {
-            // item.updateMatrix();
-            // scene.add(item);
             house.add(item);
           });
           walls.forEach((item) => {
@@ -122,7 +125,8 @@ fbxLoader.load(
 let doorsWindows: THREE.Object3D[] = [];
 let draggable: THREE.Object3D[] = [];
 let draggableCache: THREE.Object3D[] = [];
-
+let scaleX = 0;
+let scaleZ = 0;
 function addWindow() {
   fbxLoader.load(
     'models/window_2.fbx',
@@ -139,6 +143,8 @@ function addWindow() {
       window.scale.set(0.01, 0.01, 0.01);
       window.name = 'window';
       house.add(window);
+      window.matrixWorldNeedsUpdate = true;
+      window.updateMatrixWorld(true);
       doorsWindows.push(window);
       draggable.push(window);
     },
@@ -214,6 +220,7 @@ dControls.addEventListener('dragend', function (event) {
 });
 
 let mapScale = new Map<string, ScaleButton>();
+
 dControls.addEventListener('drag', (event) => {
   let eventObject = event.object as THREE.Mesh;
   let b = mapScale.get(eventObject.name);
@@ -229,8 +236,6 @@ dControls.addEventListener('drag', (event) => {
       }
       b.presentDistance = b.getDistance();
       let delta = b.presentDistance - b.pastDistance;
-      console.log(b.presentDistance, b.pastDistance);
-
       house.updateMatrix();
       house.scale.z += delta / 12;
       house.children
@@ -240,6 +245,17 @@ dControls.addEventListener('drag', (event) => {
           walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
           walls.filter((i) => i.name === item.name)[0].wall = itemClone;
         });
+      // walls
+      //   .filter((item) => item.type == 'side')
+      //   .forEach((item) => {
+      //     item.wall.scale.z += delta;
+      //     if (item.wall.position.z > 0) {
+      //       item.wall.position.z += delta / 2;
+      //     } else {
+      //       item.wall.position.z -= delta / 2;
+      //     }
+      //     item.wall.updateMatrix();
+      //   });
       b.pastDistance = b.presentDistance;
     } else if (b.type === 'x') {
       eventObject.position.z = 0;
@@ -261,8 +277,41 @@ dControls.addEventListener('drag', (event) => {
           walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
           walls.filter((i) => i.name === item.name)[0].wall = itemClone;
         });
+      // walls
+      //   .filter((item) => item.type == 'main')
+      //   .forEach((item) => {
+      //     item.wall.scale.x += delta;
+      //     if (item.wall.position.x > 0) {
+      //       item.wall.position.x += delta / 2;
+      //     } else {
+      //       item.wall.position.x -= delta / 2;
+      //     }
+      //     item.wall.updateMatrix();
+      //   });
       b.pastDistance = b.presentDistance;
     }
+    // else if (b.type === 'y') {
+    //   eventObject.position.x = 0;
+    //   eventObject.position.z = 0;
+    //   if (eventObject.position.y < b.getMin()) {
+    //     eventObject.position.y = b.getMin();
+    //   }
+    //   if (eventObject.position.y > b.getMax()) {
+    //     eventObject.position.y = b.getMax();
+    //   }
+    //   b.presentDistance = b.getDistance();
+    //   let delta = b.presentDistance - b.pastDistance;
+    //   house.updateMatrix();
+    //   house.scale.y += delta / 12;
+    //   house.children
+    //     .filter((item) => item.name.toLowerCase().includes('wall'))
+    //     .forEach((item) => {
+    //       let itemClone = (item as THREE.Mesh).clone();
+    //       walls.filter((i) => i.name === item.name)[0].oWall = itemClone;
+    //       walls.filter((i) => i.name === item.name)[0].wall = itemClone;
+    //     });
+    //   b.pastDistance = b.presentDistance;
+    // }
   }
 });
 
@@ -292,11 +341,12 @@ function adjustDoorAndWindow() {
         wallBox.getMaxX() > item.position.x
       ) {
         let g;
+
         if (item.name.toLowerCase().includes('window')) {
           g = new THREE.BoxBufferGeometry(
             boundaryBox.getWidth(),
             boundaryBox.getHeight(),
-            boundaryBox.getDepth() * 8
+            boundaryBox.getDepth() * 12
           );
         } else {
           g = new THREE.BoxBufferGeometry(
@@ -348,7 +398,7 @@ function adjustDoorAndWindow() {
         let g;
         if (item.name.toLowerCase().includes('window')) {
           g = new THREE.BoxBufferGeometry(
-            boundaryBox.getWidth() * 8,
+            boundaryBox.getWidth() * 12,
             boundaryBox.getHeight(),
             boundaryBox.getDepth()
           );
@@ -504,13 +554,12 @@ function changeEnvironment(event: THREE.Event) {
   }
 }
 
-let time = 40;
+let time = 50;
 let prev = Date.now();
 function animate() {
   let nTime = Date.now();
   let delta = nTime - prev;
   prev = nTime;
-  // Schedule the next frame.
   if (delta > time) requestAnimationFrame(animate);
   else
     setTimeout(() => {
@@ -526,42 +575,71 @@ function animate() {
 animate();
 document.getElementById('addDoor')?.addEventListener('click', addDoor);
 document.getElementById('addWindow')?.addEventListener('click', addWindow);
-
+let arrows: THREE.Mesh[] = [];
 function addButtons() {
-  {
-    let button = createScaleButton('scaleBtn1');
-    button.position.set(xx + 5, 0.1, 0);
-    button.rotation.x += Math.PI / 2;
-    button.rotation.y += Math.PI;
-    scene.add(button);
-    draggable.push(button);
-    let scaleButton = new ScaleButton(button, xx + 5, xx + 9, 'x');
-    mapScale.set(button.name, scaleButton);
-  }
-  {
-    let button = createScaleButton('scaleBtn2');
-    button.position.set(0, 0.1, zx + 5);
-    button.rotation.x += Math.PI / 2;
-    button.rotation.z -= Math.PI / 2;
-    scene.add(button);
-    draggable.push(button);
-    let scaleButton = new ScaleButton(button, zx + 5, zx + 9, 'z');
-    mapScale.set(button.name, scaleButton);
-  }
+  createScaleButton('scaleBtn1');
+  createScaleButton('scaleBtn2');
+  // createScaleButton('scaleBtn3');
+
+  setTimeout(() => {
+    {
+      let button = arrows[0];
+      button.position.set(xx + 7, 0.1, 0);
+      button.rotation.z += Math.PI / 2;
+      button.rotation.y += Math.PI / 2;
+      scene.add(button);
+      draggable.push(button);
+      let scaleButton = new ScaleButton(button, xx + 7, xx + 13, 'x');
+      mapScale.set(button.name, scaleButton);
+    }
+    {
+      let button = arrows[1];
+      button.position.set(0, 0.1, zx + 7);
+      button.rotation.x += Math.PI / 2;
+      scene.add(button);
+      draggable.push(button);
+      let scaleButton = new ScaleButton(button, zx + 7, zx + 13, 'z');
+      mapScale.set(button.name, scaleButton);
+    }
+    // {
+    //   let button = arrows[2];
+    //   button.position.set(0, yx + 7, 0);
+    //   scene.add(button);
+    //   draggable.push(button);
+    //   let scaleButton = new ScaleButton(button, yx + 7, yx + 13, 'y');
+    //   mapScale.set(button.name, scaleButton);
+    // }
+  }, 1000);
 }
 
-function createScaleButton(name: string): THREE.Mesh {
-  let g1 = new THREE.PlaneGeometry(2, 2, 100, 100);
-  let m1 = new THREE.MeshBasicMaterial({
-    color: 0x00ff00,
-    map: new THREE.TextureLoader().load('images/arrow.png'),
-    side: THREE.DoubleSide,
-    transparent: true,
-    opacity: 0.9,
-  });
-  let mc = new THREE.Mesh(g1, m1);
-  mc.name = name;
-  return mc;
+function createScaleButton(name: string) {
+  fbxLoader.load(
+    'models/arrow.fbx',
+    (obj: THREE.Object3D<THREE.Event>) => {
+      obj.traverse((child) => {
+        if ((child as THREE.Mesh).isMesh) {
+          let arrow = child as THREE.Mesh;
+          arrow.material = new THREE.MeshBasicMaterial();
+          (arrow.material as THREE.MeshBasicMaterial).color = new THREE.Color(
+            0xff0000
+          );
+          (arrow.material as THREE.MeshBasicMaterial).side = THREE.DoubleSide;
+          (arrow.material as THREE.MeshBasicMaterial).transparent = true;
+          (arrow.material as THREE.MeshBasicMaterial).opacity = 0.5;
+          (arrow.material as THREE.MeshBasicMaterial).needsUpdate = true;
+          arrow.name = name;
+          arrows.push(arrow);
+          arrow.scale.set(0.2, 0.2, 0.2);
+        }
+      });
+    },
+    (xhr) => {
+      console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
 }
 
 let mass = ['none', 'outer_wall', 'inner_wall'];
