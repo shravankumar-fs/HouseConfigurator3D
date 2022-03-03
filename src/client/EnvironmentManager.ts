@@ -5,8 +5,13 @@ export class EnvironmentManager {
   private _scene!: THREE.Scene;
   private _camera!: THREE.PerspectiveCamera;
   private _renderer!: THREE.WebGLRenderer;
+  private _predefinedCanvas!: HTMLCanvasElement;
 
   constructor() {
+    this._predefinedCanvas = document.getElementById(
+      'canvas'
+    ) as HTMLCanvasElement;
+    this.adjustCanvasSize();
     this.initScene();
     this.initCamera();
     this.initRenderer();
@@ -15,7 +20,7 @@ export class EnvironmentManager {
   }
   initLights() {
     this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 2, 60, 1);
-    // this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1.5, 60, 1);
+    this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1.5, 60, 1);
     this.initLight(new THREE.Vector3(0, 0, -45), 0xffffff, 1.5, 60, 1);
     this.initLight(new THREE.Vector3(0, 0, 45), 0xffffff, 1.5, 60, 1);
     this.initLight(new THREE.Vector3(45, 0, 0), 0xffffff, 1.5, 60, 1);
@@ -46,42 +51,52 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    this._scene.fog = new THREE.Fog(0x001f00, 10, 200);
+    this._scene.fog = new THREE.Fog(0xafff00, 70, 120);
+    this.scene.background = new THREE.Color(0xffffff);
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
 
   initCamera() {
     this._camera = new THREE.PerspectiveCamera(
       75,
-      window.innerWidth / window.innerHeight,
+      this._predefinedCanvas.width / this._predefinedCanvas.height,
       0.1,
-      200
+      1000
     );
-    this._camera.position.set(0, 10, 25);
+
+    this._camera.position.set(0, 10, 45);
   }
 
   initRenderer() {
-    const canvas = document.querySelector('canvas');
-    if (canvas) {
+    if (this._predefinedCanvas) {
       this._renderer = new THREE.WebGLRenderer({
-        canvas: canvas,
+        canvas: this._predefinedCanvas,
         antialias: true,
       });
+      this._renderer.setSize(
+        this._predefinedCanvas.width,
+        this._predefinedCanvas.height
+      );
     } else {
       this._renderer = new THREE.WebGLRenderer({
         antialias: true,
       });
+      this._renderer.physicallyCorrectLights = true;
+      this._renderer.setSize(window.innerWidth, window.innerHeight);
     }
-    this._renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
   addGround() {
-    let groundG = new THREE.CircleBufferGeometry(250, 1000);
+    let groundG = new THREE.CircleBufferGeometry(50, 100);
     let tex = new THREE.TextureLoader().load('images/grass.jpg');
     tex.wrapS = THREE.RepeatWrapping;
     tex.wrapT = THREE.RepeatWrapping;
-    tex.repeat.set(100, 100);
-    let groundM = new THREE.MeshBasicMaterial({ map: tex });
+    tex.repeat.set(50, 50);
+    let groundM = new THREE.MeshBasicMaterial({
+      map: tex,
+      transparent: true,
+      opacity: 0.9,
+    });
     let ground = new THREE.Mesh(groundG, groundM);
     ground.rotation.x -= Math.PI / 2;
     ground.position.y = -0.2;
@@ -89,10 +104,21 @@ export class EnvironmentManager {
   }
 
   onWindowResize() {
-    this._camera.aspect = window.innerWidth / window.innerHeight;
+    this.adjustCanvasSize();
+    this._camera.aspect =
+      this._predefinedCanvas.width / this._predefinedCanvas.height;
     this._camera.updateProjectionMatrix();
-    this._renderer.setSize(window.innerWidth, window.innerHeight);
+    this._renderer.setSize(
+      this._predefinedCanvas.width,
+      this._predefinedCanvas.height
+    );
+
     this.render();
+  }
+
+  private adjustCanvasSize() {
+    this._predefinedCanvas.height = (window.innerHeight * 5) / 5;
+    this._predefinedCanvas.width = (window.innerWidth * 5) / 5;
   }
 
   render() {

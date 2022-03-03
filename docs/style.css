@@ -1,5 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@700&family=Kanit:wght@900&display=swap');
 * {
   box-sizing: content-box;
+  /* font-family: 'Inconsolata', monospace; */
 }
 body {
   overflow: hidden;
@@ -7,215 +9,206 @@ body {
   display: flex;
   flex-direction: row;
   position: relative;
+  perspective: 500;
 }
 :root {
-  --bg-panel: linear-gradient(
-    135deg,
-    hsla(207, 43%, 55%, 0.8),
-    hsla(207, 71%, 32%, 0.8)
-  );
   --bg-button: linear-gradient(
     135deg,
-    hsla(207, 44%, 49%, 1),
-    hsla(207, 44%, 20%, 1)
+    hsla(40, 35%, 63%, 0.8),
+    hsla(40, 35%, 43%, 0.8)
   );
-  --bg-button-rev: hsl(207, 44%, 19%, 1);
-  --panel-box-shadow: 12px 12px 16px 0 rgba(0, 0, 0, 0.25),
-    -8px -8px 12px 0 rgba(255, 255, 255, 0.3);
-  --btn-box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.25),
-    -2px -2px 4px 0 rgba(255, 255, 255, 0.3);
+  --bg-button-rev: hsla(40, 35%, 23%, 0.9);
 }
+.navbar {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  z-index: 4;
+  height: 50px;
+  width: 100%;
+  padding: 2px 10px;
+}
+.logo {
+  height: inherit;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  gap: 30px;
+}
+.logo img {
+  height: 30px;
+  width: 30px;
+  background: linear-gradient(
+    135deg,
+    hsl(43, 74%, 49%) 60%,
+    hsl(43, 74%, 100%) 62%,
+    hsl(43, 74%, 49%) 65%
+  );
+  box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3), -2px -2px 2px rgba(0, 0, 0, 0.25);
+  padding: 10px;
+  border-radius: 50%;
+  transform: rotateX(20deg);
+}
+.logo .title {
+  position: relative;
+  font-family: 'Kanit', sans-serif;
+  font-size: 30px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: goldenrod;
+  text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3), -2px -2px 2px rgba(0, 0, 0, 0.25);
+}
+
 canvas {
   z-index: 1;
 }
-.sidebar {
-  position: relative;
-  width: 190px;
-  height: fit-content;
-  margin-top: 30px;
-}
 .panel {
   position: absolute;
-  display: flex;
-  gap: 10px;
-  flex-direction: column;
-  height: fit-content;
-  width: inherit;
-  padding: 20px 10px 10px 10px;
+  top: 100px;
+  right: 0;
   z-index: 3;
   background: var(--bg-panel);
-  box-shadow: var(--panel-box-shadow);
-  border-radius: 0 20px 20px 0;
-}
-.themeSelector {
+  /* box-shadow: var(--panel-box-shadow);   */
   display: flex;
-  justify-content: flex-start;
+  flex-direction: row-reverse;
   align-items: center;
-  z-index: 4;
-}
-.themeSelector select {
-  background-color: var(--bg-button-rev);
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 5px 5px;
-}
-.themeSelector select option {
-  background-color: var(--bg-button);
-  color: white;
-  border: none;
-  border-radius: 10px !important;
 }
 
-.themeSelector label {
-  color: var(--bg-button-rev);
-  font-weight: 700;
-  font-size: 16px;
-  text-align: left;
-  text-shadow: -1px -1px 8px white, 1px 1px 8px black;
-  top: 10px;
-}
-.info {
+/**Panel */
+.dock {
   display: flex;
   flex-direction: column;
   z-index: 3;
-  gap: 20px;
-  padding: 20px;
-  border-radius: 0 20px 20px 0;
+  /* gap: 10px; */
+  /* padding: 20px; */
+  border-radius: 20px 0 0 20px;
 }
-.buttonsAdd {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
+
 .buttonAdd {
   display: flex;
   flex-direction: column;
   align-items: center;
   color: white;
   border: none;
-  border-radius: 10px;
-  box-shadow: 0px 1px 3px teal;
-  font-size: 10px;
+  /* border-radius: 10px; */
+  /* box-shadow: 0px 1px 3px teal; */
+  gap: 5px;
+  font-size: 12px;
   cursor: pointer;
-  padding: 5px 10px;
-  height: fit-content;
-  width: fit-content;
+  padding: 10px;
   background: var(--bg-button);
-  box-shadow: var(--btn-box-shadow);
-}
-.buttonAdd img {
+  /* box-shadow: var(--btn-box-shadow); */
   height: 40px;
   width: 40px;
 }
+.buttonAdd img {
+  height: 20px;
+  width: 20px;
+}
 .buttonAdd:active,
 .buttonAdd:hover {
-  transform: scale(0.98);
+  /* transform: scale(0.98); */
   background: var(--bg-button-rev);
+}
+
+.materialPanel {
+  position: absolute;
+  bottom: 0;
+  width: fit-content;
+  height: 100px;
+  left: 50%;
+  z-index: 3;
+  transform: translate(-50%);
+  display: flex;
+  flex-direction: column;
+  animation: dialogue-appear 0.6s ease-in-out;
 }
 .dialog {
   position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   z-index: 3;
   height: fit-content;
   width: fit-content;
-  gap: 20px;
-  padding: 20px 5px 0px 5px;
-  animation: dialogue-appear 0.6s ease-in-out;
+  overflow-x: scroll;
+  gap: 2px;
 }
 @keyframes dialogue-appear {
   0% {
-    top: -800px;
+    left: -600px;
     z-index: -1;
   }
   90% {
     z-index: -1;
-    top: 20px;
-  }
-  93% {
-    top: 0px;
-  }
-  96% {
-    top: 40px;
+    left: 20px;
   }
   100% {
-    top: 0px;
+    left: 0px;
     z-index: 3;
   }
 }
-.subDialogue {
-  box-shadow: 0px 2px 1px rgba(0, 0, 100, 0.2);
-  padding: 5px 5px;
-}
-.title {
-  width: inherit;
-  text-align: center;
-  color: var(--bg-button-rev);
-  background-color: whitesmoke;
-  padding: 5px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-}
 .set {
-  padding: 20px 10px;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  cursor: pointer;
+  gap: 2px;
 }
 .set .colorItem {
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid rgba(0, 0, 0, 0.4);
-}
-.set .textureSet {
-  gap: 0px;
+  height: 50px;
+  width: 50px;
 }
 .set .textureItem {
   height: 50px;
   width: 50px;
-  border-radius: 10px;
-  cursor: pointer;
-  border-top: 1px solid rgba(0, 0, 0, 0.7);
 }
 .set .colorItem.selected,
 .set .textureItem.selected {
-  transform: scale(1.2);
+  transform: scale(1.01);
   box-shadow: 2px 4px 2px 2px rgba(0, 0, 0, 0.3),
     0px -2px 2px 2px rgba(100, 255, 255, 0.3);
-  border: none;
 }
 .actionBtns {
   display: flex;
-  justify-content: space-evenly;
-  gap: 10px;
-  padding: 5px 0px;
+  justify-content: center;
+  gap: 5px;
+  padding: 2px 0px;
 }
-
 .actionBtns .action {
-  background: var(--bg-button);
-  box-shadow: var(--btn-box-shadow);
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 50%;
   height: 30px;
-  width: 60px;
+  width: 25px;
   cursor: pointer;
 }
-
+.actionBtns .action img {
+  height: 16px;
+  width: 16px;
+}
+.actionBtns #confirm {
+  background: linear-gradient(
+    135deg,
+    hsl(120, 100%, 35%) 70%,
+    hsl(120, 73%, 75%)
+  );
+  --rev-color: linear-gradient(
+    45deg,
+    hsl(120, 100%, 35%) 70%,
+    hsl(120, 73%, 75%)
+  );
+}
+.actionBtns #cancel {
+  background: linear-gradient(135deg, darkred 70%, red);
+  --rev-color: linear-gradient(45deg, darkred 70%, red);
+}
 .actionBtns .action:active,
 .actionBtns .action:hover {
   transform: scale(0.98);
-  background: var(--bg-button-rev);
+  background: var(--rev-color);
 }
 
+/**Mouse click circles */
 .controlArray {
   position: absolute;
   --len: 100px;

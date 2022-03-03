@@ -43,6 +43,7 @@ export class WallItem {
   }
 
   public resetWall() {
+    this._shadowWall.geometry.dispose();
     (this._shadowWall as THREE.Mesh).geometry = (
       this._wall as THREE.Mesh
     ).geometry.clone();

@@ -2,6 +2,8 @@ import * as THREE from 'three';
 
 export class EditPanelGroup {
   meshItem: THREE.Group;
+  materialPanel!: HTMLDivElement;
+
   constructor(
     item: THREE.Group,
     private type: string,
@@ -9,6 +11,11 @@ export class EditPanelGroup {
     private singleMesh?: boolean
   ) {
     this.meshItem = item;
+    document.getElementById('materialPanel')?.remove();
+    this.materialPanel = document.createElement('div');
+    this.materialPanel.classList.add('materialPanel');
+    this.materialPanel.id = 'materialPanel';
+    document.body.append(this.materialPanel);
   }
 
   colors: string[] = [
@@ -31,10 +38,9 @@ export class EditPanelGroup {
   ];
 
   add(): void {
-    document.querySelectorAll('.dialog').forEach((d) => d.remove());
     let dialog = this.createElement('div', 'dialog', 'dialog');
     this.fillDialogueContent(dialog as HTMLDivElement);
-    document.getElementById('panel')?.appendChild(dialog);
+    this.materialPanel.appendChild(dialog);
 
     let selItems = document.querySelectorAll('.colorItem');
     let selectedColor = '';
@@ -62,7 +68,7 @@ export class EditPanelGroup {
     let cancel = document.getElementById('cancel');
     let confirm = document.getElementById('confirm');
     cancel?.addEventListener('click', () => {
-      dialog.remove();
+      this.materialPanel.remove();
     });
     confirm?.addEventListener('click', () => {
       if (selectedTexture) {
@@ -147,7 +153,7 @@ export class EditPanelGroup {
         });
       }
 
-      dialog.remove();
+      this.materialPanel.remove();
     });
   }
 
@@ -159,7 +165,7 @@ export class EditPanelGroup {
     dialog.appendChild(textureSet);
 
     let actions = this.getActionPanel();
-    dialog.appendChild(actions);
+    this.materialPanel.appendChild(actions);
   }
 
   private getDialogueColors() {
@@ -168,9 +174,9 @@ export class EditPanelGroup {
       'colorDialogue',
       'subDialogue'
     );
-    let title = this.createElement('div', 'dcTitle', 'title');
-    title.innerHTML = `${this.type} Color`;
-    colorDialogue.appendChild(title);
+    // let title = this.createElement('div', 'dcTitle', 'title');
+    // title.innerHTML = `${this.type} Color`;
+    // colorDialogue.appendChild(title);
 
     let colorSet = this.createElement('div', 'colorSet', 'set');
     this.colors.forEach((color) => {
@@ -192,9 +198,9 @@ export class EditPanelGroup {
       'textureDialogue',
       'subDialogue'
     );
-    let title = this.createElement('div', 'dtTitle', 'title');
-    title.innerHTML = `${this.type} Texture`;
-    textureDialogue.appendChild(title);
+    // let title = this.createElement('div', 'dtTitle', 'title');
+    // title.innerHTML = `${this.type} Texture`;
+    // textureDialogue.appendChild(title);
 
     let textureSet = this.createElement('div', 'textureSet', 'set');
     this.textures.forEach((texture) => {
@@ -214,9 +220,9 @@ export class EditPanelGroup {
   private getActionPanel() {
     let actions = this.createElement('div', 'dActions', 'actionBtns');
     let cancel = this.createElement('button', 'cancel', 'action');
-    cancel.innerHTML = 'Cancel';
+    cancel.innerHTML = '<img src="images/icons/cancel.svg"/>';
     let confirm = this.createElement('button', 'confirm', 'action');
-    confirm.innerHTML = 'Confirm';
+    confirm.innerHTML = `<img src="images/icons/confirm.svg"/>`;
     actions.appendChild(cancel);
     actions.appendChild(confirm);
 

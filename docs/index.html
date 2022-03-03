@@ -14,40 +14,44 @@
   </head>
 
   <body>
-    <!-- <div class="options"></div> -->
-    <canvas id="canvas"></canvas>
-    <script type="module" src="bundle.js"></script>
-    <div class="sidebar">
-      <div class="panel" id="panel">
-        <div class="themeSelector">
-          <label for="themeSel">Panel Theme&nbsp;&nbsp;</label>
-          <select id="themeSel">
-            <option value="0" selected>Blue</option>
-            <option value="1">Purple</option>
-            <option value="2">Golden</option>
-          </select>
-        </div>
-        <div class="themeSelector">
-          <label for="massSel">Mass Edit&nbsp;&nbsp;</label>
-          <select id="massSel">
-            <option value="0" selected>None</option>
-            <option value="1">Outer Walls</option>
-            <option value="2">Inner Walls</option>
-          </select>
-        </div>
-        <div class="info" id="info">
-          <div class="buttonsAdd">
-            <button id="addDoor" class="buttonAdd">
-              <img src="images/icons/door.svg" />
-              Door
-            </button>
-            <button id="addWindow" class="buttonAdd">
-              <img src="images/icons/window.svg" />
-              Window
-            </button>
-          </div>
-        </div>
+    <div class="navbar">
+      <div class="logo">
+        <img src="images/icons/home.svg" alt="" />
+        <div class="title">House Configurator</div>
       </div>
     </div>
+    <canvas id="canvas"></canvas>
+    <script type="module" src="bundle.js"></script>
+    <div class="panel" id="panel">
+      <div class="dock" id="dock">
+        <button id="addDoor" class="buttonAdd">
+          <img src="images/icons/door.svg" />
+          Door
+        </button>
+        <button id="addWindow" class="buttonAdd">
+          <img src="images/icons/window.svg" />
+          Window
+        </button>
+        <button id="outerwallchange" class="buttonAdd">
+          <img src="images/icons/outerwall.svg" />
+          Exterior
+        </button>
+        <button id="innerwallchange" class="buttonAdd">
+          <img src="images/icons/indoorwall.svg" />
+          Interior
+        </button>
+        <button id="floorchange" class="buttonAdd">
+          <img src="images/icons/floor.svg" />
+          Floor
+        </button>
+        <button id="3dview" class="buttonAdd">
+          <img src="images/icons/walk.svg" />
+          Walk
+        </button>
+      </div>
+      <!--dock-->
+    </div>
+
+    <div class="materialPanel" id="materialPanel"></div>
   </body>
 </html>
