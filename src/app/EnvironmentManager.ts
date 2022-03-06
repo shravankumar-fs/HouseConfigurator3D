@@ -16,7 +16,7 @@ export class EnvironmentManager {
     this.initCamera();
     this.initRenderer();
     this.initLights();
-    this.addGround();
+    // this.addGround();
   }
   initLights() {
     this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 2, 60, 1);
@@ -25,6 +25,10 @@ export class EnvironmentManager {
     this.initLight(new THREE.Vector3(0, 0, 45), 0xffffff, 1.5, 60, 1);
     this.initLight(new THREE.Vector3(45, 0, 0), 0xffffff, 1.5, 60, 1);
     this.initLight(new THREE.Vector3(-45, 0, 0), 0xffffff, 1.5, 60, 1);
+
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 10);
+    directionalLight.position.set(0, 70, 50);
+    this._scene.add(directionalLight);
   }
   initLight(
     pos: THREE.Vector3,

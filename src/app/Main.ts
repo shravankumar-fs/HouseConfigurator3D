@@ -54,23 +54,24 @@ let xm = 999,
 let house = new THREE.Group();
 house.name = 'house';
 fbxLoader.load(
-  'models/interior.fbx',
-  (obj) => {
+  // 'models/interior.fbx',
+  'models/MAPS/modified01.fbx',
+  (obj: THREE.Object3D) => {
     let totalHouseChildren = 0;
-    obj.traverse((child) => {
+    obj.traverse((child: THREE.Object3D) => {
       if ((child as THREE.Mesh).isMesh) {
         totalHouseChildren++;
       }
     });
 
-    obj.traverse((child) => {
+    obj.traverse((child: any) => {
       if ((child as THREE.Mesh).isMesh) {
         let mesh = child as THREE.Mesh<
           THREE.BufferGeometry,
           THREE.MeshLambertMaterial
         >;
 
-        mesh.material = mesh.material.clone();
+        // mesh.material = mesh.material.clone();
         mesh.material.side = THREE.DoubleSide;
         mesh.material.reflectivity = 0;
         mesh.material.refractionRatio = 0;
@@ -115,14 +116,17 @@ fbxLoader.load(
 
           // addButtons();
           scene.add(house);
+          //Change#
+          house.scale.set(0.01, 0.01, 0.01);
+          house.position.set(0, 0, 30);
         }
       }
     });
   },
-  (xhr) => {
+  (xhr: { loaded: number; total: number }) => {
     console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
   },
-  (error) => {
+  (error: any) => {
     console.log(error);
   }
 );
@@ -135,14 +139,19 @@ function addWindow() {
     'models/window_2.fbx',
     (window: THREE.Object3D) => {
       window.position.set(10, 3, 10);
-      window.traverse((child) => {
-        if ((child as THREE.Mesh).isMesh) {
-          child.position.x = 0;
-          child.position.y = 0;
-          child.position.z = 0;
-          child.updateMatrix();
+      window.traverse(
+        (child: {
+          position: { x: number; y: number; z: number };
+          updateMatrix: () => void;
+        }) => {
+          if ((child as THREE.Mesh).isMesh) {
+            child.position.x = 0;
+            child.position.y = 0;
+            child.position.z = 0;
+            child.updateMatrix();
+          }
         }
-      });
+      );
       window.scale.set(0.01, 0.01, 0.01);
       window.name = 'window';
       house.add(window);
@@ -163,7 +172,7 @@ function addDoor() {
   fbxLoader.load(
     'models/door.fbx',
     (obj: THREE.Object3D<THREE.Event>) => {
-      obj.traverse(function (child) {
+      obj.traverse(function (child: any) {
         if ((child as THREE.Mesh).isMesh) {
           let door = child as THREE.Mesh;
           door.name = 'door';
@@ -179,17 +188,17 @@ function addDoor() {
         }
       });
     },
-    (xhr) => {
+    (xhr: { loaded: number; total: number }) => {
       console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
     },
-    (error) => {
+    (error: any) => {
       console.log(error);
     }
   );
 }
 
 const dControls = new DragControls(draggable, camera, renderer.domElement);
-dControls.addEventListener('hoveron', function (event) {
+dControls.addEventListener('hoveron', function (event: THREE.Event) {
   let eventObject = event.object;
   if (eventObject.parent) {
     if (eventObject.parent.name == 'window') {
@@ -208,23 +217,23 @@ dControls.addEventListener('hoveron', function (event) {
     }
   }
 });
-dControls.addEventListener('hoveroff', function (event) {
+dControls.addEventListener('hoveroff', function (event: any) {
   draggableCache.forEach((item) => {
     draggable.push(item);
   });
   draggableCache.length = 0;
   dControls.transformGroup = false;
 });
-dControls.addEventListener('dragstart', function (event) {
+dControls.addEventListener('dragstart', function (event: any) {
   controls.enabled = false;
 });
-dControls.addEventListener('dragend', function (event) {
+dControls.addEventListener('dragend', function (event: any) {
   controls.enabled = true;
 });
 
 let mapScale = new Map<string, ScaleButton>();
 
-dControls.addEventListener('drag', (event) => {
+dControls.addEventListener('drag', (event: THREE.Event) => {
   let eventObject = event.object as THREE.Mesh;
   let b = mapScale.get(eventObject.name);
   if (b) {
@@ -287,36 +296,38 @@ dControls.addEventListener('drag', (event) => {
       house.updateMatrix();
       house.scale.x += delta / 15;
       house.updateMatrix();
-      house.children.forEach((child) => {
-        let isWall = wallBorderMap.get(child.name);
-        let isMainWall = false;
-        let isSideWall = false;
-        if (isWall && isWall.type == 'main') {
-          isMainWall = true;
-          // isWall.wall.visible = false;
-        } else if (isWall && isWall.type == 'side') {
-          isSideWall = true;
-          // isWall.wall.visible = false;
-        }
-        if (
-          !isMainWall &&
-          !child.name.toLowerCase().includes('floor') &&
-          !child.name.toLowerCase().includes('roof')
-        ) {
-          let x = 1 / house.scale.x;
-          let y = child.scale.y;
-          let z = child.scale.z;
-          console.log((child as THREE.Mesh).geometry);
+      house.children.forEach(
+        (child: { name: string; scale: { y: any; z: any; x: number } }) => {
+          let isWall = wallBorderMap.get(child.name);
+          let isMainWall = false;
+          let isSideWall = false;
+          if (isWall && isWall.type == 'main') {
+            isMainWall = true;
+            // isWall.wall.visible = false;
+          } else if (isWall && isWall.type == 'side') {
+            isSideWall = true;
+            // isWall.wall.visible = false;
+          }
+          if (
+            !isMainWall &&
+            !child.name.toLowerCase().includes('floor') &&
+            !child.name.toLowerCase().includes('roof')
+          ) {
+            let x = 1 / house.scale.x;
+            let y = child.scale.y;
+            let z = child.scale.z;
+            console.log((child as THREE.Mesh).geometry);
 
-          // child.updateMatrix();
-          child.scale.x = x;
-          // child.updateMatrix();
-          // if (!child.name.toLowerCase().includes('wall')) {
-          //   child.position.x += delta / 15;
-          // }
-        } else {
+            // child.updateMatrix();
+            child.scale.x = x;
+            // child.updateMatrix();
+            // if (!child.name.toLowerCase().includes('wall')) {
+            //   child.position.x += delta / 15;
+            // }
+          } else {
+          }
         }
-      });
+      );
       console.log('ok true');
 
       // house.children
@@ -587,7 +598,7 @@ function changeEnvironment(event: THREE.Event) {
           )[0];
           let mixer = new THREE.AnimationMixer(ob);
           const clips = ob.animations;
-          clips.forEach(function (clip) {
+          clips.forEach(function (clip: any) {
             mixer.clipAction(clip).play();
           });
           let clock = new THREE.Clock();
@@ -658,7 +669,6 @@ function animate() {
   if (Math.random() > 0.8) envManager.render();
 }
 
-animate();
 document.getElementById('addDoor')?.addEventListener('click', addDoor);
 document.getElementById('addWindow')?.addEventListener('click', addWindow);
 let arrows: THREE.Mesh[] = [];
@@ -702,7 +712,7 @@ function createScaleButton(name: string) {
   fbxLoader.load(
     'models/arrow.fbx',
     (obj: THREE.Object3D<THREE.Event>) => {
-      obj.traverse((child) => {
+      obj.traverse((child: any) => {
         if ((child as THREE.Mesh).isMesh) {
           let arrow = child as THREE.Mesh;
           arrow.material = new THREE.MeshBasicMaterial();
@@ -719,10 +729,10 @@ function createScaleButton(name: string) {
         }
       });
     },
-    (xhr) => {
+    (xhr: { loaded: number; total: number }) => {
       console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
     },
-    (error) => {
+    (error: any) => {
       console.log(error);
     }
   );
@@ -751,7 +761,7 @@ document.getElementById('innerwallchange')?.addEventListener('click', () => {
   dialog.add();
 });
 document.getElementById('floorchange')?.addEventListener('click', () => {
-  const floor = house.children.filter((item) =>
+  const floor = house.children.filter((item: { name: string }) =>
     item.name.toLowerCase().includes('floor')
   )[0];
   let dialog = new EditPanel(floor as THREE.Mesh, 'Floor', meshCache);
@@ -765,11 +775,13 @@ const controlsPointerLock = new PointerLockControls(
 let oldpos = camera.position.clone();
 controlsPointerLock.addEventListener('lock', () => {
   oldpos = camera.position.clone();
+  camera.position.y = 5;
 
   controls.enabled = false;
   dControls.enabled = false;
 });
 controlsPointerLock.addEventListener('unlock', () => {
+  camera.position.set(oldpos.x, oldpos.y, oldpos.z);
   controls.enabled = true;
 });
 
@@ -781,18 +793,20 @@ const onKeyDown = function (event: KeyboardEvent) {
   if (controlsPointerLock.isLocked) {
     switch (event.code) {
       case 'KeyW':
-        controlsPointerLock.moveForward(1);
+        controlsPointerLock.moveForward(0.3);
         break;
       case 'KeyA':
-        controlsPointerLock.moveRight(-1);
+        controlsPointerLock.moveRight(-0.3);
         break;
       case 'KeyS':
-        controlsPointerLock.moveForward(-1);
+        controlsPointerLock.moveForward(-0.3);
         break;
       case 'KeyD':
-        controlsPointerLock.moveRight(1);
+        controlsPointerLock.moveRight(0.3);
         break;
     }
   }
 };
 document.addEventListener('keydown', onKeyDown, false);
+
+animate();
