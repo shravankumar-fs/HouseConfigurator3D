@@ -26,8 +26,8 @@ export class EnvironmentManager {
     this.initLight(new THREE.Vector3(45, 0, 0), 0xffffff, 1.5, 60, 1);
     this.initLight(new THREE.Vector3(-45, 0, 0), 0xffffff, 1.5, 60, 1);
 
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 10);
-    directionalLight.position.set(0, 70, 50);
+    let directionalLight = new THREE.SpotLight(0xffffff, 2, 2000, Math.PI, 0);
+    directionalLight.position.set(0, 1000, 20);
     this._scene.add(directionalLight);
   }
   initLight(
@@ -85,7 +85,7 @@ export class EnvironmentManager {
       this._renderer = new THREE.WebGLRenderer({
         antialias: true,
       });
-      this._renderer.physicallyCorrectLights = true;
+      // this._renderer.physicallyCorrectLights = true;
       this._renderer.setSize(window.innerWidth, window.innerHeight);
     }
   }

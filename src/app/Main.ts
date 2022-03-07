@@ -17,6 +17,7 @@ import { ScaleButton } from './Controllers/Scale/ScaleButton';
 import { WindowBorder } from './Models/WindowBorder';
 import { AnimateButton } from './Controllers/Control/AnimateButton';
 import { EditPanelGroup } from './Controllers/EditPanelWindow';
+import { MeshPhongMaterial } from 'three';
 
 let envManager = new EnvironmentManager();
 let scene = envManager.scene;
@@ -68,32 +69,12 @@ fbxLoader.load(
       if ((child as THREE.Mesh).isMesh) {
         let mesh = child as THREE.Mesh<
           THREE.BufferGeometry,
-          THREE.MeshLambertMaterial
+          THREE.MeshPhongMaterial | MeshPhongMaterial[]
         >;
-
+        materialModify(mesh);
+        if (!mesh.name.toLowerCase().includes('roof')) objects.push(mesh);
         // mesh.material = mesh.material.clone();
-        mesh.material.side = THREE.DoubleSide;
-        mesh.material.reflectivity = 0;
-        mesh.material.refractionRatio = 0;
-        mesh.updateMatrix();
-        mesh.updateMatrixWorld(true);
-        if (mesh.name.toLowerCase().includes('wall')) {
-          mesh.material.color = new THREE.Color(0x1f6f8f);
-          let wallItem = new WallItem(mesh);
-          walls.push(wallItem);
-        } else {
-          if (mesh.name.toLowerCase().includes('floor')) {
-            mesh.material.color = new THREE.Color(0xdfaf00);
-          } else if (mesh.name.toLowerCase().includes('roof')) {
-            mesh.material.transparent = true;
-            mesh.material.opacity = 0.7;
-            mesh.material.color = new THREE.Color(0xffaf00);
-          } else {
-            mesh.material.color = new THREE.Color(0xffffff);
-          }
-          // if (!mesh.name.toLowerCase().includes('roof'))
-          objects.push(mesh);
-        }
+
         ++count;
         if (count === totalHouseChildren) {
           walls.forEach((item) => {
@@ -130,6 +111,46 @@ fbxLoader.load(
     console.log(error);
   }
 );
+
+function materialModify(
+  mesh: THREE.Mesh<
+    THREE.BufferGeometry,
+    THREE.MeshPhongMaterial | THREE.MeshPhongMaterial[]
+  >
+) {
+  let material = mesh.material;
+  if (material instanceof THREE.MeshPhongMaterial) {
+    material.side = THREE.DoubleSide;
+    material.depthWrite = true;
+    material.reflectivity = 0;
+    material.refractionRatio = 0;
+  } else {
+    material.forEach((item) => {
+      item.side = THREE.DoubleSide;
+      item.depthWrite = true;
+      item.reflectivity = 0;
+      item.refractionRatio = 0;
+    });
+  }
+  mesh.updateMatrix();
+  mesh.updateMatrixWorld(true);
+  if (mesh.name.toLowerCase().includes('wall')) {
+    // mesh.material.color = new THREE.Color(0x1f6f8f);
+    let wallItem = new WallItem(mesh);
+    walls.push(wallItem);
+  } else {
+    if (mesh.name.toLowerCase().includes('floor')) {
+      // mesh.material.color = new THREE.Color(0xdfafff);
+    } else if (mesh.name.toLowerCase().includes('roof')) {
+      // mesh.material.transparent = true;
+      // mesh.material.opacity = 0.7;
+      // mesh.material.color = new THREE.Color(0xffaf00);
+    } else {
+      // mesh.material.color = new THREE.Color(0xffffff);
+    }
+  }
+}
+
 let doorsWindows: THREE.Object3D[] = [];
 let draggable: THREE.Object3D[] = [];
 let draggableCache: THREE.Object3D[] = [];
@@ -181,7 +202,7 @@ function addDoor() {
           );
           (door.material as THREE.MeshLambertMaterial).side = THREE.DoubleSide;
           (door.material as THREE.MeshLambertMaterial).needsUpdate = true;
-          door.position.set(5, 5, 15);
+          door.position.set(5, 25, 15);
           draggable.push(door);
           house.add(door);
           doorsWindows.push(door);
@@ -775,7 +796,7 @@ const controlsPointerLock = new PointerLockControls(
 let oldpos = camera.position.clone();
 controlsPointerLock.addEventListener('lock', () => {
   oldpos = camera.position.clone();
-  camera.position.y = 5;
+  camera.position.y = 3;
 
   controls.enabled = false;
   dControls.enabled = false;
