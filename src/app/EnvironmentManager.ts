@@ -19,15 +19,15 @@ export class EnvironmentManager {
     // this.addGround();
   }
   initLights() {
-    this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 2, 60, 1);
-    this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1.5, 60, 1);
-    this.initLight(new THREE.Vector3(0, 0, -45), 0xffffff, 1.5, 60, 1);
-    this.initLight(new THREE.Vector3(0, 0, 45), 0xffffff, 1.5, 60, 1);
-    this.initLight(new THREE.Vector3(45, 0, 0), 0xffffff, 1.5, 60, 1);
-    this.initLight(new THREE.Vector3(-45, 0, 0), 0xffffff, 1.5, 60, 1);
+    this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 1, 60, 1);
+    this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1, 60, 1);
+    this.initLight(new THREE.Vector3(0, 0, -65), 0xffffff, 1, 60, 1);
+    this.initLight(new THREE.Vector3(0, 0, 65), 0xffffff, 1, 60, 1);
+    this.initLight(new THREE.Vector3(65, 0, 0), 0xffffff, 1, 60, 1);
+    this.initLight(new THREE.Vector3(-65, 0, 0), 0xffffff, 1, 60, 1);
 
-    let directionalLight = new THREE.SpotLight(0xffffff, 2, 2000, Math.PI, 0);
-    directionalLight.position.set(0, 1000, 20);
+    let directionalLight = new THREE.AmbientLight(0xffffff, 1);
+    directionalLight.position.set(0, 500, 20);
     this._scene.add(directionalLight);
   }
   initLight(
@@ -55,7 +55,7 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    this._scene.fog = new THREE.Fog(0xafff00, 70, 120);
+    // this._scene.fog = new THREE.Fog(0xafff00, 70, 120);
     this.scene.background = new THREE.Color(0xffffff);
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
@@ -85,7 +85,7 @@ export class EnvironmentManager {
       this._renderer = new THREE.WebGLRenderer({
         antialias: true,
       });
-      // this._renderer.physicallyCorrectLights = true;
+      this._renderer.physicallyCorrectLights = true;
       this._renderer.setSize(window.innerWidth, window.innerHeight);
     }
   }

@@ -264,3 +264,14 @@ canvas {
   background: linear-gradient(-45deg, darkgreen, green);
   transform: translate(-50%, -50%) scale(1.1);
 }
+
+.controlPane {
+  display: block;
+  padding: 10px 20px;
+  background: var(--bg-button);
+  height: fit-content;
+  width: fit-content;
+  color: white;
+  font-size: large;
+  border-radius: 10px 10px 0 0;
+}

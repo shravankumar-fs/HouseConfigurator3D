@@ -17,7 +17,7 @@ import { ScaleButton } from './Controllers/Scale/ScaleButton';
 import { WindowBorder } from './Models/WindowBorder';
 import { AnimateButton } from './Controllers/Control/AnimateButton';
 import { EditPanelGroup } from './Controllers/EditPanelWindow';
-import { MeshPhongMaterial } from 'three';
+import { MeshPhongMaterial, MeshPhysicalMaterial } from 'three';
 
 let envManager = new EnvironmentManager();
 let scene = envManager.scene;
@@ -56,7 +56,7 @@ let house = new THREE.Group();
 house.name = 'house';
 fbxLoader.load(
   // 'models/interior.fbx',
-  'models/MAPS/modified01.fbx',
+  'models/MAPS/01.fbx',
   (obj: THREE.Object3D) => {
     let totalHouseChildren = 0;
     obj.traverse((child: THREE.Object3D) => {
@@ -99,7 +99,9 @@ fbxLoader.load(
           scene.add(house);
           //Change#
           house.scale.set(0.01, 0.01, 0.01);
-          house.position.set(0, 0, 30);
+          house.rotation.x -= Math.PI / 2;
+          house.position.set(220, 2, 0);
+          console.log(house.position);
         }
       }
     });
@@ -124,6 +126,7 @@ function materialModify(
     material.depthWrite = true;
     material.reflectivity = 0;
     material.refractionRatio = 0;
+    material.blending = 0;
   } else {
     material.forEach((item) => {
       item.side = THREE.DoubleSide;
@@ -685,7 +688,8 @@ function animate() {
     }, time - delta);
   // if (doorsWindows.length > 0)
   adjustDoorAndWindow();
-  controls.update();
+  // if(lockControls)
+  if (controls.enabled) controls.update();
 
   if (Math.random() > 0.8) envManager.render();
 }
@@ -789,21 +793,19 @@ document.getElementById('floorchange')?.addEventListener('click', () => {
   dialog.add();
 });
 
-const controlsPointerLock = new PointerLockControls(
-  camera,
-  renderer.domElement
-);
+const controlsPointerLock = new PointerLockControls(camera, document.body);
 let oldpos = camera.position.clone();
 controlsPointerLock.addEventListener('lock', () => {
-  oldpos = camera.position.clone();
-  camera.position.y = 3;
-
   controls.enabled = false;
   dControls.enabled = false;
+  oldpos = camera.position.clone();
+  camera.position.set(0, 5, 0);
+  toggleControlPane(true);
 });
 controlsPointerLock.addEventListener('unlock', () => {
   camera.position.set(oldpos.x, oldpos.y, oldpos.z);
   controls.enabled = true;
+  toggleControlPane(false);
 });
 
 document.getElementById('3dview')?.addEventListener('click', () => {
@@ -831,3 +833,18 @@ const onKeyDown = function (event: KeyboardEvent) {
 document.addEventListener('keydown', onKeyDown, false);
 
 animate();
+
+function toggleControlPane(controlOn: boolean) {
+  if (controlOn) {
+    let cont = document.createElement('div');
+    cont.id = 'controlPane';
+    cont.innerHTML = `
+      <div>Press W,A,S,D to move around;</div>
+      <div>Use mouse to look, Escape to stop </div>
+    `;
+    cont.classList.add('controlPane');
+    document.getElementById('materialPanel')?.appendChild(cont);
+  } else {
+    document.getElementById('controlPane')?.remove();
+  }
+}
