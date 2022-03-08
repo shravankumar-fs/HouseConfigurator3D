@@ -72,6 +72,8 @@ fbxLoader.load(
           THREE.MeshPhongMaterial | MeshPhongMaterial[]
         >;
         materialModify(mesh);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
         if (!mesh.name.toLowerCase().includes('roof')) objects.push(mesh);
         // mesh.material = mesh.material.clone();
 
@@ -97,11 +99,13 @@ fbxLoader.load(
 
           // addButtons();
           scene.add(house);
+          house.castShadow = true;
           //Change#
           house.scale.set(0.01, 0.01, 0.01);
           house.rotation.x -= Math.PI / 2;
           house.position.set(220, 2, 0);
-          console.log(house.position);
+
+          // console.log(house.position);
         }
       }
     });

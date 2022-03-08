@@ -20,15 +20,21 @@ export class EnvironmentManager {
   }
   initLights() {
     this.initLight(new THREE.Vector3(0, 45, 0), 0xffffff, 1, 60, 1);
-    this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1, 60, 1);
-    this.initLight(new THREE.Vector3(0, 0, -65), 0xffffff, 1, 60, 1);
-    this.initLight(new THREE.Vector3(0, 0, 65), 0xffffff, 1, 60, 1);
-    this.initLight(new THREE.Vector3(65, 0, 0), 0xffffff, 1, 60, 1);
-    this.initLight(new THREE.Vector3(-65, 0, 0), 0xffffff, 1, 60, 1);
+    // this.initLight(new THREE.Vector3(0, -45, 0), 0xffffff, 1, 60, 1);
+    // this.initLight(new THREE.Vector3(0, 0, -65), 0xffffff, 1, 60, 1);
+    // this.initLight(new THREE.Vector3(0, 0, 65), 0xffffff, 1, 60, 1);
+    // this.initLight(new THREE.Vector3(65, 0, 0), 0xffffff, 1, 60, 1);
+    // this.initLight(new THREE.Vector3(-65, 0, 0), 0xffffff, 1, 60, 1);
 
-    let directionalLight = new THREE.AmbientLight(0xffffff, 1);
-    directionalLight.position.set(0, 500, 20);
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 6);
+    directionalLight.position.set(0, 300, 100);
     this._scene.add(directionalLight);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.bias = -0.0003;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.camera.near = 0.5;
+    directionalLight.shadow.camera.far = 700;
   }
   initLight(
     pos: THREE.Vector3,
@@ -40,6 +46,11 @@ export class EnvironmentManager {
     let light = new THREE.PointLight(color, intensity, distance, decay);
     light.position.set(pos.x, pos.y, pos.z);
     this._scene.add(light);
+    light.castShadow = true;
+    light.shadow.mapSize.width = 512;
+    light.shadow.mapSize.height = 512;
+    light.shadow.camera.near = 0.5;
+    light.shadow.camera.far = 100;
   }
 
   public get scene() {
@@ -55,7 +66,7 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    // this._scene.fog = new THREE.Fog(0xafff00, 70, 120);
+    // this._scene.fog = new THREE.FogExp2(0xafff00, 1);
     this.scene.background = new THREE.Color(0xffffff);
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
@@ -85,9 +96,11 @@ export class EnvironmentManager {
       this._renderer = new THREE.WebGLRenderer({
         antialias: true,
       });
-      this._renderer.physicallyCorrectLights = true;
       this._renderer.setSize(window.innerWidth, window.innerHeight);
     }
+    this._renderer.shadowMap.enabled = true;
+    this._renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    this._renderer.physicallyCorrectLights = true;
   }
 
   addGround() {
