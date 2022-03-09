@@ -790,10 +790,10 @@ document.getElementById('innerwallchange')?.addEventListener('click', () => {
   dialog.add();
 });
 document.getElementById('floorchange')?.addEventListener('click', () => {
-  const floor = house.children.filter((item: { name: string }) =>
-    item.name.toLowerCase().includes('floor')
-  )[0];
-  let dialog = new EditPanel(floor as THREE.Mesh, 'Floor', meshCache);
+  // const floor = house.children.filter((item: { name: string }) =>
+  //   item.name.toLowerCase().includes('floor')
+  // )[0];
+  let dialog = new EditPanelGroup(house, 'Floor', 'floor', true);
   dialog.add();
 });
 

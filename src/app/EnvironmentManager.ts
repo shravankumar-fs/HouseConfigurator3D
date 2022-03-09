@@ -26,7 +26,7 @@ export class EnvironmentManager {
     // this.initLight(new THREE.Vector3(65, 0, 0), 0xffffff, 1, 60, 1);
     // this.initLight(new THREE.Vector3(-65, 0, 0), 0xffffff, 1, 60, 1);
 
-    let directionalLight = new THREE.DirectionalLight(0xffffff, 6);
+    let directionalLight = new THREE.DirectionalLight(0xffffff, 5);
     directionalLight.position.set(0, 300, 100);
     this._scene.add(directionalLight);
     directionalLight.castShadow = true;
@@ -34,7 +34,7 @@ export class EnvironmentManager {
     directionalLight.shadow.mapSize.width = 1024;
     directionalLight.shadow.mapSize.height = 1024;
     directionalLight.shadow.camera.near = 0.5;
-    directionalLight.shadow.camera.far = 700;
+    directionalLight.shadow.camera.far = 1000;
   }
   initLight(
     pos: THREE.Vector3,
@@ -50,7 +50,7 @@ export class EnvironmentManager {
     light.shadow.mapSize.width = 512;
     light.shadow.mapSize.height = 512;
     light.shadow.camera.near = 0.5;
-    light.shadow.camera.far = 100;
+    light.shadow.camera.far = 300;
   }
 
   public get scene() {
@@ -66,7 +66,7 @@ export class EnvironmentManager {
 
   initScene() {
     this._scene = new THREE.Scene();
-    // this._scene.fog = new THREE.FogExp2(0xafff00, 1);
+    this._scene.fog = new THREE.Fog(0xafff00, 1);
     this.scene.background = new THREE.Color(0xffffff);
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
