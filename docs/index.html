@@ -15,16 +15,22 @@
 
   <body>
     <div class="navbar">
-      <div class="logo">
-        <img src="images/icons/home.svg" alt="" />
-        <div class="title">House Configurator</div>
+      <img src="images/icons/home.svg" alt="" />
+      <!-- <div class="title">House Configurator</div> -->
+      <div class="spacer"></div>
+      <div class="menu">
+        <div class="menuItem active" id="outerwallchange">Exterior</div>
+        <div class="menuItem" id="innerwallchange">Interior</div>
+        <div class="menuItem" id="floorchange">Floors</div>
+        <div class="menuItem" id="3dview">Walk</div>
+        <div class="menuItem" id="addDoor">Extras</div>
       </div>
     </div>
     <canvas id="canvas"></canvas>
     <script type="module" src="bundle.js"></script>
     <div class="panel" id="panel">
       <div class="dock" id="dock">
-        <button id="addDoor" class="buttonAdd">
+        <!-- <button id="addDoor" class="buttonAdd">
           <img src="images/icons/door.svg" />
           Door
         </button>
@@ -47,7 +53,7 @@
         <button id="3dview" class="buttonAdd">
           <img src="images/icons/walk.svg" />
           Walk
-        </button>
+        </button> -->
       </div>
       <!--dock-->
     </div>

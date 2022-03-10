@@ -71,6 +71,8 @@ fbxLoader.load(
           THREE.BufferGeometry,
           THREE.MeshPhongMaterial | MeshPhongMaterial[]
         >;
+        console.log(mesh);
+
         materialModify(mesh);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
@@ -103,9 +105,7 @@ fbxLoader.load(
           //Change#
           house.scale.set(0.01, 0.01, 0.01);
           house.rotation.x -= Math.PI / 2;
-          house.position.set(220, 2, 0);
-
-          // console.log(house.position);
+          house.position.set(210, 2, 0);
         }
       }
     });
@@ -779,20 +779,23 @@ function createScaleButton(name: string) {
 //   }
 // });
 
-document.getElementById('outerwallchange')?.addEventListener('click', () => {
+document.getElementById('outerwallchange')?.addEventListener('click', (e) => {
   let name = 'Exterior';
+  manageActive(e);
   let dialog = new EditPanelGroup(house, name, 'outer_wall', true);
   dialog.add();
 });
-document.getElementById('innerwallchange')?.addEventListener('click', () => {
+document.getElementById('innerwallchange')?.addEventListener('click', (e) => {
   let name = 'Interior';
+  manageActive(e);
   let dialog = new EditPanelGroup(house, name, 'inner_wall', true);
   dialog.add();
 });
-document.getElementById('floorchange')?.addEventListener('click', () => {
+document.getElementById('floorchange')?.addEventListener('click', (e) => {
   // const floor = house.children.filter((item: { name: string }) =>
   //   item.name.toLowerCase().includes('floor')
   // )[0];
+  manageActive(e);
   let dialog = new EditPanelGroup(house, 'Floor', 'floor', true);
   dialog.add();
 });
@@ -812,7 +815,9 @@ controlsPointerLock.addEventListener('unlock', () => {
   toggleControlPane(false);
 });
 
-document.getElementById('3dview')?.addEventListener('click', () => {
+document.getElementById('3dview')?.addEventListener('click', (e) => {
+  manageActive(e);
+  document.querySelector('.dialog')?.remove();
   controlsPointerLock.lock();
 });
 
@@ -851,4 +856,10 @@ function toggleControlPane(controlOn: boolean) {
   } else {
     document.getElementById('controlPane')?.remove();
   }
+}
+function manageActive(e: MouseEvent) {
+  document
+    .querySelectorAll('.menuItem')
+    .forEach((item) => item.classList.remove('active'));
+  (e.target as HTMLDivElement).classList.add('active');
 }

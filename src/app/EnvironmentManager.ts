@@ -68,6 +68,7 @@ export class EnvironmentManager {
     this._scene = new THREE.Scene();
     this._scene.fog = new THREE.Fog(0xafff00, 1);
     this.scene.background = new THREE.Color(0xffffff);
+
     this.scene.background = new TextureLoader().load('images/sky.jpg');
   }
 
@@ -79,7 +80,7 @@ export class EnvironmentManager {
       1000
     );
 
-    this._camera.position.set(0, 10, 45);
+    this._camera.position.set(0, 5, 25);
   }
 
   initRenderer() {

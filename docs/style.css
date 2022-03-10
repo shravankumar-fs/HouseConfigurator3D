@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@700&family=Kanit:wght@900&display=swap');
 * {
   box-sizing: content-box;
-  /* font-family: 'Inconsolata', monospace; */
+  font-family: 'Inconsolata', monospace;
 }
 body {
   overflow: hidden;
@@ -12,6 +12,7 @@ body {
   perspective: 500;
 }
 :root {
+  --bg-base: hsl(200, 74%, 39%);
   --bg-button: linear-gradient(
     135deg,
     hsla(40, 35%, 63%, 0.8),
@@ -24,32 +25,30 @@ body {
   top: 0px;
   left: 0px;
   z-index: 4;
-  height: 50px;
+  height: 60px;
   width: 100%;
-  padding: 2px 10px;
-}
-.logo {
-  height: inherit;
+  padding: 0px 20px;
+
   display: flex;
-  justify-content: left;
+  justify-content: center;
   align-items: center;
-  gap: 30px;
+  background: linear-gradient(135deg, white, hsla(200, 50%, 99%, 0.9));
 }
-.logo img {
+.navbar img {
   height: 30px;
   width: 30px;
   background: linear-gradient(
     135deg,
-    hsl(43, 74%, 49%) 60%,
-    hsl(43, 74%, 100%) 62%,
-    hsl(43, 74%, 49%) 65%
+    var(--bg-base) 60%,
+    hsl(200, 74%, 100%) 62%,
+    var(--bg-base) 65%
   );
   box-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3), -2px -2px 2px rgba(0, 0, 0, 0.25);
   padding: 10px;
   border-radius: 50%;
   transform: rotateX(20deg);
 }
-.logo .title {
+/* .navbar .title {
   position: relative;
   font-family: 'Kanit', sans-serif;
   font-size: 30px;
@@ -57,6 +56,36 @@ body {
   letter-spacing: 2px;
   color: goldenrod;
   text-shadow: 2px 2px 1px rgba(0, 0, 0, 0.3), -2px -2px 2px rgba(0, 0, 0, 0.25);
+} */
+.navbar .spacer {
+  flex: 1 1 auto;
+}
+.navbar .menu {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  gap: 20px;
+  height: 60px;
+  padding-right: 50px;
+}
+.navbar .menu .menuItem {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  padding: 0px 10px;
+  height: inherit;
+  width: fit-content;
+  color: var(--bg-base);
+  letter-spacing: 1.5px;
+  font-size: 14px;
+  position: relative;
+  cursor: pointer;
+  transition: all 1s ease;
+}
+.navbar .menu .menuItem.active {
+  color: hsl(200, 74%, 100%);
+  background: linear-gradient(135deg, var(--bg-base) 90%, hsl(200, 73%, 75%));
+  /* background-color: var(--bg-base); */
 }
 
 canvas {
@@ -112,56 +141,83 @@ canvas {
 }
 
 .materialPanel {
-  position: absolute;
-  bottom: 0;
-  width: fit-content;
-  height: 100px;
-  left: 50%;
+  /* position: absolute;
+  right: 0px;
+  top: 60px;
   z-index: 3;
-  transform: translate(-50%);
+  background: red;
+ transform: translate(-50%); 
+  display: flex;
+  flex-direction: column; */
+  /* animation: dialogue-appear 0.6s ease-in-out; */
+  position: absolute;
+  right: 0px;
+  top: 60px;
+  z-index: 3;
   display: flex;
   flex-direction: column;
+  background-color: hsl(200, 74%, 100%);
   animation: dialogue-appear 0.6s ease-in-out;
+  width: 200px;
+  height: fit-content;
+  /* justify-content: center; 
+  align-items: center;  */
+  /* padding: 30px 25px; */
 }
 .dialog {
-  position: relative;
+  /* position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  z-index: 3;
+  height: 200px;
+  width: fit-content;
+  overflow-x: scroll;
+  gap: 2px; */
+
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 3;
-  height: fit-content;
-  width: fit-content;
-  overflow-x: scroll;
-  gap: 2px;
+  gap: 10px;
+  flex-direction: column;
+  padding: 25px 25px;
 }
 @keyframes dialogue-appear {
   0% {
-    left: -600px;
-    z-index: -1;
-  }
-  90% {
-    z-index: -1;
-    left: 20px;
+    right: -600px;
   }
   100% {
-    left: 0px;
-    z-index: 3;
+    right: 0px;
   }
 }
 .set {
-  display: flex;
+  /* display: flex;
   flex-direction: row;
   cursor: pointer;
-  gap: 2px;
+  gap: 5px; */
+  display: flex;
+  cursor: pointer;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 .set .colorItem {
-  height: 50px;
-  width: 50px;
+  height: 60px;
+  width: 60px;
+  border-radius: 20px;
+  border: 1px solid hsla(200, 70%, 22%, 0.1);
 }
 .set .textureItem {
-  height: 50px;
-  width: 50px;
+  /* height: 50px;
+  width: 50px; */
+  height: 60px;
+  width: 60px;
+  border-radius: 20px;
+  border: 1px solid hsla(200, 70%, 22%, 0.1);
 }
+
 .set .colorItem.selected,
 .set .textureItem.selected {
   transform: scale(1.01);
@@ -171,15 +227,15 @@ canvas {
 .actionBtns {
   display: flex;
   justify-content: center;
-  gap: 5px;
-  padding: 2px 0px;
+  gap: 10px;
+  padding: 20px 0px;
 }
 .actionBtns .action {
   color: white;
   border: none;
-  border-radius: 50%;
+  border-radius: 20px;
   height: 30px;
-  width: 25px;
+  width: 50px;
   cursor: pointer;
 }
 .actionBtns .action img {
@@ -187,20 +243,20 @@ canvas {
   width: 16px;
 }
 .actionBtns #confirm {
+  background: linear-gradient(135deg, var(--bg-base) 70%, hsl(200, 73%, 75%));
+  --rev-color: linear-gradient(45deg, var(--bg-base) 70%, hsl(200, 73%, 75%));
+}
+.actionBtns #cancel {
   background: linear-gradient(
     135deg,
-    hsl(120, 100%, 35%) 70%,
-    hsl(120, 73%, 75%)
+    hsl(200, 100%, 69%) 70%,
+    hsl(200, 73%, 89%)
   );
   --rev-color: linear-gradient(
     45deg,
-    hsl(120, 100%, 35%) 70%,
-    hsl(120, 73%, 75%)
+    hsl(200, 100%, 69%) 70%,
+    hsl(200, 73%, 89%)
   );
-}
-.actionBtns #cancel {
-  background: linear-gradient(135deg, darkred 70%, red);
-  --rev-color: linear-gradient(45deg, darkred 70%, red);
 }
 .actionBtns .action:active,
 .actionBtns .action:hover {
@@ -268,10 +324,11 @@ canvas {
 .controlPane {
   display: block;
   padding: 10px 20px;
-  background: var(--bg-button);
+  background: hsl(200, 74%, 100%);
   height: fit-content;
-  width: fit-content;
-  color: white;
-  font-size: large;
-  border-radius: 10px 10px 0 0;
+  width: 150px;
+  color: var(--bg-base);
+  font-size: small;
+  letter-spacing: 1px;
+  border-radius: 0px 0px 0px 20px;
 }

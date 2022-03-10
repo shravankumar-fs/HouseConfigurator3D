@@ -42,8 +42,8 @@ export class EditPanel {
     this.meshCache.forEach((mesh) => {
       this.adjustTransparency(mesh);
     });
-    (this.meshItem.material as THREE.MeshLambertMaterial).transparent = true;
-    (this.meshItem.material as THREE.MeshLambertMaterial).opacity = 0.5;
+    (this.meshItem.material as THREE.MeshPhongMaterial).transparent = true;
+    (this.meshItem.material as THREE.MeshPhongMaterial).opacity = 0.5;
 
     let dialog = this.createElement('div', 'dialog', 'dialog');
     this.fillDialogueContent(dialog as HTMLDivElement);
@@ -85,13 +85,13 @@ export class EditPanel {
           text.wrapS = THREE.RepeatWrapping;
           text.wrapT = THREE.RepeatWrapping;
           // text.repeat.set(6, 6);
-          (this.meshItem.material as THREE.MeshLambertMaterial).map = text;
+          (this.meshItem.material as THREE.MeshPhongMaterial).map = text;
         } else {
-          (this.meshItem.material as THREE.MeshLambertMaterial).map = null;
+          (this.meshItem.material as THREE.MeshPhongMaterial).map = null;
         }
       }
       if (selectedColor) {
-        (this.meshItem.material as THREE.MeshLambertMaterial).color =
+        (this.meshItem.material as THREE.MeshPhongMaterial).color =
           new THREE.Color(selectedColor);
       }
       if (selectedTexture || selectedColor) {
@@ -109,7 +109,7 @@ export class EditPanel {
     dialog.appendChild(textureSet);
 
     let actions = this.getActionPanel();
-    this.materialPanel.appendChild(actions);
+    dialog.appendChild(actions);
   }
 
   private getDialogueColors() {
@@ -181,16 +181,16 @@ export class EditPanel {
 
   private adjustTransparency(mesh: THREE.Mesh) {
     if (mesh.name.toLowerCase().includes('window')) {
-      (mesh.material as THREE.MeshLambertMaterial).transparent = true;
-      (mesh.material as THREE.MeshLambertMaterial).opacity = 0.2;
+      (mesh.material as THREE.MeshPhongMaterial).transparent = true;
+      (mesh.material as THREE.MeshPhongMaterial).opacity = 0.2;
 
-      // (this.meshItem.material as THREE.MeshLambertMaterial).wireframe = false;
+      // (this.meshItem.material as THREE.MeshPhongMaterial).wireframe = false;
     } else {
-      (mesh.material as THREE.MeshLambertMaterial).transparent = false;
-      (mesh.material as THREE.MeshLambertMaterial).opacity = 1;
+      (mesh.material as THREE.MeshPhongMaterial).transparent = false;
+      (mesh.material as THREE.MeshPhongMaterial).opacity = 1;
 
-      // (this.meshItem.material as THREE.MeshLambertMaterial).wireframe = false;
+      // (this.meshItem.material as THREE.MeshPhongMaterial).wireframe = false;
     }
-    (mesh.material as THREE.MeshLambertMaterial).needsUpdate = true;
+    (mesh.material as THREE.MeshPhongMaterial).needsUpdate = true;
   }
 }

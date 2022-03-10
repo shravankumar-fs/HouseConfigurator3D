@@ -79,10 +79,8 @@ export class EditPanelGroup {
           this.meshItem.traverse((child) => {
             let childObj = child as THREE.Mesh;
             if (childObj.isMesh) {
-              if (
-                (childObj.material as THREE.MeshLambertMaterial[]).length > 1
-              ) {
-                (childObj.material as THREE.MeshLambertMaterial[])
+              if ((childObj.material as THREE.MeshPhongMaterial[]).length > 1) {
+                (childObj.material as THREE.MeshPhongMaterial[])
                   .filter((item) =>
                     item.name.toLowerCase().includes(this.editElement)
                   )
@@ -97,8 +95,8 @@ export class EditPanelGroup {
                 text.wrapS = THREE.RepeatWrapping;
                 text.wrapT = THREE.RepeatWrapping;
                 // text.repeat.set(6, 6);
-                (childObj.material as THREE.MeshLambertMaterial).map = text;
-                (childObj.material as THREE.MeshLambertMaterial).needsUpdate =
+                (childObj.material as THREE.MeshPhongMaterial).map = text;
+                (childObj.material as THREE.MeshPhongMaterial).needsUpdate =
                   true;
               }
             }
@@ -107,10 +105,8 @@ export class EditPanelGroup {
           this.meshItem.traverse((child) => {
             let childObj = child as THREE.Mesh;
             if (childObj.isMesh) {
-              if (
-                (childObj.material as THREE.MeshLambertMaterial[]).length > 1
-              ) {
-                (childObj.material as THREE.MeshLambertMaterial[])
+              if ((childObj.material as THREE.MeshPhongMaterial[]).length > 1) {
+                (childObj.material as THREE.MeshPhongMaterial[])
                   .filter((item) =>
                     item.name.toLowerCase().includes(this.editElement)
                   )
@@ -122,8 +118,8 @@ export class EditPanelGroup {
                 childObj.name.toLowerCase().includes(this.editElement)
               ) {
                 // text.repeat.set(6, 6);
-                (childObj.material as THREE.MeshLambertMaterial).map = null;
-                (childObj.material as THREE.MeshLambertMaterial).needsUpdate =
+                (childObj.material as THREE.MeshPhongMaterial).map = null;
+                (childObj.material as THREE.MeshPhongMaterial).needsUpdate =
                   true;
               }
             }
@@ -134,8 +130,8 @@ export class EditPanelGroup {
         this.meshItem.traverse((child) => {
           let childObj = child as THREE.Mesh;
           if (childObj.isMesh) {
-            if ((childObj.material as THREE.MeshLambertMaterial[]).length > 1) {
-              (childObj.material as THREE.MeshLambertMaterial[])
+            if ((childObj.material as THREE.MeshPhongMaterial[]).length > 1) {
+              (childObj.material as THREE.MeshPhongMaterial[])
                 .filter((item) =>
                   item.name.toLowerCase().includes(this.editElement)
                 )
@@ -144,10 +140,9 @@ export class EditPanelGroup {
                   mat.needsUpdate = true;
                 });
             } else if (childObj.name.toLowerCase().includes(this.editElement)) {
-              (childObj.material as THREE.MeshLambertMaterial).color =
+              (childObj.material as THREE.MeshPhongMaterial).color =
                 new THREE.Color(selectedColor);
-              (childObj.material as THREE.MeshLambertMaterial).needsUpdate =
-                true;
+              (childObj.material as THREE.MeshPhongMaterial).needsUpdate = true;
             }
           }
         });
@@ -165,7 +160,7 @@ export class EditPanelGroup {
     dialog.appendChild(textureSet);
 
     let actions = this.getActionPanel();
-    this.materialPanel.appendChild(actions);
+    dialog.appendChild(actions);
   }
 
   private getDialogueColors() {
